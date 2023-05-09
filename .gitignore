@@ -1,3 +1,5 @@
 /local_vars.py
 /formatting.xlsx
 /workshop/
+.Rproj.user
+__pycache__
