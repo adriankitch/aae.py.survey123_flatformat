@@ -184,15 +184,15 @@ for svy in survey_list:
             else:
                 # # If no obs hit but shot exists then include shot
                 site_samples = list(filter(lambda x: x[16] == site_id, sample_list))
-                # if there are samples then add empty shot
 
+                # if there are samples then add empty shot
                 if section_condition == 'yes' and len(site_samples) > 0:
                     func.sssoc_info.append(cls.SiteObs(site_id, section_number, '', 0, 0, 0, shot_id, ''))
 
                 # no samples then add 'No Fish'
                 elif section_condition == 'yes' and len(site_samples) == 0:
                     func.sssoc_info.append(cls.SiteObs(site_id, section_number, 'No Fish', 0, 0, 0, shot_id, ''))
-                # #                print('add shot')
+
     else:
         # # if no shots exist then put in 1 shot if fishable or samples are present and add site info
         site_samples = list(filter(lambda x: x[16] == site_id, sample_list))
@@ -292,9 +292,11 @@ for smp in sample_list:
 
     # print(smp[0])
 
+    # species name or custom name required
     if smp[3] is not None or smp[4] is not None:
         samples_present = True
         sample_id = smp[1]
+
         section_number = 0 if smp[2] is None else smp[2]
         # #        if smp[2] is not None:
         # #            print(smp[2])
@@ -303,19 +305,20 @@ for smp in sample_list:
         tl = '' if smp[6] is None else smp[6]
         w = '' if smp[7] is None else smp[7]
 
-        skip_samp = 0
-        if (smp[8] is None or smp[8] == 0) and fl == '' and tl == '' and w == '':
-            skip_samp = 1
+        recapture = 'no' if smp[9] is None else smp[9]
+        pit = "{0}".format(smp[11]) if smp[11] is not None else ''
+        external_tag_no = '' if smp[10] is None else smp[10]
+        genetics_label = '' if smp[13] is None else smp[13]
+        otoliths_label = 'no' if smp[14] is None else smp[14]
+        fauna_notes = '' if smp[15] is None else smp[15]
 
-        if skip_samp == 0:
+        skip_samp = FALSE
+        if (smp[8] is None or smp[8] == 0) and section_number == 0 and fl == '' and tl == '' and w == '' and recapture == 'no' and pit == '' and external_tag_no == '' and genetics_label == '' and otoliths_label == 'no' and fauna_notes == '':
+            skip_samp = TRUE
+
+        if skip_samp == FALSE:
 
             coll = 1 if smp[8] is None or smp[8] == 0 else smp[8]
-            recapture = smp[9]
-            pit = "{0}".format(smp[11]) if smp[11] is not None else ''
-            external_tag_no = smp[10]
-            genetics_label = smp[13]
-            otoliths_label = smp[14]
-            fauna_notes = smp[15]
             sample_site_id = smp[16]
 
             if sample_site_id != prev_sample_site_id:
@@ -328,7 +331,6 @@ for smp in sample_list:
                 # #-------get species
                 # #- -----------GET RANDOM SHOT
 
-
             shot_i = func.get_random_shot(sample_site_id, species) if section_number == 0 else str(section_number)
 
             #get site/survey for the shot selected
@@ -336,6 +338,7 @@ for smp in sample_list:
 
             extra_shot = 0
             if len(sub_site_survey_info) == 0:
+
                 extra_shot = 1
                 shot_i = str(section_number)
                 sub_site_survey_info = list(filter(lambda x: x['k_site_id'] == sample_site_id and x['k_section_number'] == '1', func.site_survey_info))
@@ -415,7 +418,7 @@ for sobs in func.sssoc_info:
 
     prev_site_id = sobs[0]
 
-func.sheet_sort_rows(ws_write, 2, 0, [2, 7, 18, 27, 32, 31])
+func.sheet_sort_rows(ws_write, 2, 0, [47, 7, 18, 27, 32, 31])
 func.set_col_date_style(ws_write, (7-1))
 
 row_count = 1

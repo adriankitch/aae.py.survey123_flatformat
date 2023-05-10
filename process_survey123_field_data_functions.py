@@ -7,7 +7,7 @@ from openpyxl.utils import get_column_letter
 global sssoc_info
 global site_survey_info
 site_survey_info = []
-sssoc_info = []
+sssoc_info = []  # site survey section observed collected
 
 
 gear_types = {
@@ -44,7 +44,7 @@ def get_random_shot(rs_site_id, rs_species):
     shotlist = []
     # print(str(len(rs_sub_sssoc_info)))
     if rs_sub_sssoc_info is None or len(rs_sub_sssoc_info) == 0:
-        print('No collected {0} available in shots for site {1}'.format(rs_species, rs_site_id))
+        print('Notice: No collected {0} available in shots for site {1}'.format(rs_species, rs_site_id))
 
     if len(rs_sub_sssoc_info) > 0:
         # #        print('step 1')
@@ -90,7 +90,7 @@ def get_random_shot(rs_site_id, rs_species):
         # print(len(shotlist))
 
     if rs_sub_sssoc_info is None or len(shotlist) == 0:
-        print('*** No {0}: {1} available'.format(rs_site_id, rs_species))
+        print('Notice: *** No {0}: {1} available'.format(rs_site_id, rs_species))
     else:
         return random.choice(shotlist)
 
@@ -206,7 +206,7 @@ def extra_record_output(ws, ero_site_id, ero_row_count):
     return ero_row_count
 
 def extra_record_output_no_fish_shot(ws, ero_site_id, ero_section_number, ero_row_count):
-    sub_sssoc_info = list(filter(lambda x: x[0] == ero_site_id and x[1] == ero_section_number, sssoc_info))
+    sub_sssoc_info = list(filter(lambda x: x[0] == ero_site_id and x[1] == int(ero_section_number), sssoc_info))
     # print(len(sub_sssoc_info))
     # #                if prev_sample_site_id == 'becd3e03-1cd0-44cc-8f3b-69cc65ef1957' and len(sub_sssoc_info) <= 0:
     # #                    print('no hit for shot 8')
