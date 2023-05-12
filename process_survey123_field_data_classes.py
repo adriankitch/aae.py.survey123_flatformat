@@ -1,4 +1,20 @@
 
+
+class SiteSections:
+    def __init__(self, so_site_id, so_section_number):
+        self.site_id = so_site_id
+        self.section_number = so_section_number
+        self.index = dict(
+            {0: self.site_id,
+             1: self.section_number}
+        )
+
+    def __getitem__(self, key):
+        return self.index[key]
+
+    def __setitem__(self, key, newvalue):
+        self.index[key] = newvalue
+
 class SiteObs:
     def __init__(self, so_site_id, so_section_number, so_species, so_collected, so_observed, so_collected2, so_shot_id, so_obs_id):
         self.site_id = so_site_id

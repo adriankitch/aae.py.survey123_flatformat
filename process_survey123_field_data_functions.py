@@ -3,11 +3,15 @@ import re
 import openpyxl
 from openpyxl.styles import NamedStyle
 from openpyxl.utils import get_column_letter
+from openpyxl import load_workbook
+import process_survey123_field_data_classes as cls
 
 global sssoc_info
 global site_survey_info
+global site_section_used
 site_survey_info = []
 sssoc_info = []  # site survey section observed collected
+site_section_used = []
 
 
 gear_types = {
@@ -111,11 +115,13 @@ def read_in_excel_tab(wkbook_sheet):
 
 def adjust_species_shot(ass_site_id, ass_species, ass_section_number, ass_collected):
 
+    found_data = False
     for ass_i in sssoc_info:
 
         # #        count = 0
         if ass_site_id == ass_i[0] and ass_section_number == ass_i[1] and ass_species == ass_i[2]:
             # #                print('{0},{1},{2},{3}'.format(i[0], i[1], i[2], i[5]))
+            found_data = True
             if ass_collected is None:
                 ass_collected = 1
 
@@ -125,6 +131,10 @@ def adjust_species_shot(ass_site_id, ass_species, ass_section_number, ass_collec
                 ass_i[5] = ass_i[5] - 1
             return ass_i[5]
     # #        count = count + 1
+
+    if not found_data:
+        sssoc_info.append(cls.SiteObs(ass_site_id, ass_section_number, ass_species, 0, 0, ass_collected, 'IN SAMPLE INFO', ''))
+
     return -1
 
 def write_row(write_sheet, row_num: int, starting_column: str or int, write_values: list):
@@ -206,10 +216,7 @@ def extra_record_output(ws, ero_site_id, ero_row_count):
     return ero_row_count
 
 def extra_record_output_no_fish_shot(ws, ero_site_id, ero_section_number, ero_row_count):
-    sub_sssoc_info = list(filter(lambda x: x[0] == ero_site_id and x[1] == int(ero_section_number), sssoc_info))
-    # print(len(sub_sssoc_info))
-    # #                if prev_sample_site_id == 'becd3e03-1cd0-44cc-8f3b-69cc65ef1957' and len(sub_sssoc_info) <= 0:
-    # #                    print('no hit for shot 8')
+    sub_sssoc_info = list(filter(lambda x: x[0] == ero_site_id and x[1] == str(ero_section_number), sssoc_info))
     ero_row_count = write_extra_data(ws, sub_sssoc_info, ero_row_count, 'no_shot_fish')
 
     return ero_row_count

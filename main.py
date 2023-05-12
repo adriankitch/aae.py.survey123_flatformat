@@ -183,15 +183,17 @@ for svy in survey_list:
 
             else:
                 # # If no obs hit but shot exists then include shot
-                site_samples = list(filter(lambda x: x[16] == site_id, sample_list))
 
-                # if there are samples then add empty shot
-                if section_condition == 'yes' and len(site_samples) > 0:
+                # site_samples = list(filter(lambda x: x[16] == site_id and x[2] == section_number, sample_list))
+
+                # if there are samples then add No Fish shot
+                if section_condition == 'yes':  # and len(site_samples) >= 0:
                     func.sssoc_info.append(cls.SiteObs(site_id, section_number, '', 0, 0, 0, shot_id, ''))
 
-                # no samples then add 'No Fish'
-                elif section_condition == 'yes' and len(site_samples) == 0:
-                    func.sssoc_info.append(cls.SiteObs(site_id, section_number, 'No Fish', 0, 0, 0, shot_id, ''))
+                # # no samples then add 'No Fish'
+                # elif section_condition == 'yes' and len(site_samples) == 0:
+                #     print("Adding No fish: Site: {0}, Shot: {1}".format(site_id, section_number))
+                #     func.sssoc_info.append(cls.SiteObs(site_id, section_number, 'No Fish', 0, 0, 0, shot_id, ''))
 
     else:
         # # if no shots exist then put in 1 shot if fishable or samples are present and add site info
@@ -351,7 +353,8 @@ for smp in sample_list:
             if isinstance(shot_i, str):
                 shot_i = int(shot_i)
 
-            shots_used.append(shot_i)
+            # shots_used.append(shot_i)
+            func.site_section_used.append(cls.SiteSections(sample_site_id, int(shot_i)))
 
             for ss_row in sub_site_survey_info:
                 func.adjust_species_shot(sample_site_id, species, str(shot_i), coll)
@@ -400,9 +403,15 @@ for smp in sample_list:
 row_count = func.extra_record_output(ws_write, prev_sample_site_id, row_count)
 
 # ADD any no samples shots (but other shots in site had fish)
+# for sobs in func.sssoc_info:
+#     if sobs[1] not in shots_used and sobs[2] == '' and sobs[7] == '':
+#         row_count = func.extra_record_output_no_fish_shot(ws_write, sobs[0], sobs[1], row_count)
+
 for sobs in func.sssoc_info:
-    if sobs[1] not in shots_used and sobs[2] == '' and sobs[7] == '':
+    site_section_list = list(filter(lambda x: x[0] == sobs[0] and x[1] == int(sobs[1]), func.site_section_used))
+    if len(site_section_list) == 0 and sobs[2] == '' and sobs[7] == '':
         row_count = func.extra_record_output_no_fish_shot(ws_write, sobs[0], sobs[1], row_count)
+
 
 # ADD any no samples fish sites
 prev_site_id = ''
@@ -426,10 +435,11 @@ xl_header = list(("site_id", "section_number", "species", "collected", "observed
 func.write_row(ws2_write, row_count, 1, xl_header)
 
 for i in func.sssoc_info:
-    xl_row = list((i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7]))
+    xl_row = list((i[0], int(i[1]), i[2], i[3], i[4], i[5], i[6], i[7]))
     row_count += 1
     func.write_row(ws2_write, row_count, 1, xl_row)
 
+func.sheet_sort_rows(ws2_write, 2, 0, [1, 2, 3])
 
 dnow = datetime.now()
 fdt = dnow.strftime("%y") + dnow.strftime("%m") + dnow.strftime("%d")
