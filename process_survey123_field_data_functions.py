@@ -230,7 +230,7 @@ def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
                 # #                            print('converting shot')
                 wed_shot_i = int(wed_shot_i)
 
-            wed_sub_site_survey_info = list(filter(lambda x: x['k_site_id'] == s[0] and x['k_section_number'] == s[1], site_survey_info))
+            wed_sub_site_survey_info = list(filter(lambda x: x['k_site_id'] == s[0] and x['k_section_number'] == str(s[1]), site_survey_info))
             # print(s[0], s[1])
             if extraDataType == 'extra_caught':
                 if len(wed_sub_site_survey_info) > 1:
@@ -247,6 +247,17 @@ def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
             elif extraDataType == 'no_shot_fish':
                 if len(wed_sub_site_survey_info) > 1:
                     print('*** MULTIPLE SURVEY ERROR GETTING NO SHOT FISH for site: {0} shot: {1}'.format(s[0], s[1]))
+
+                elif len(wed_sub_site_survey_info) == 0:
+                    wed_sub_site_survey_info = list(filter(lambda x: x['k_site_id'] == s[0] and x['k_section_number'] == '1', site_survey_info))
+                    if len(wed_sub_site_survey_info) > 0:
+                        # wed_sub_site_survey_info[0]
+                        write_excel_row(ws_out, r_count, wed_sub_site_survey_info[0], int(s[1]), 'No Fish', '', '', '', 0, 0, '', '', '', '', '', '', s[7], '')
+                        print('*** ADDED EXTRA SHOT WITH NO FISH for site: {0} shot: {1}'.format(s[0], s[1]))
+                        r_count += 1
+                        return r_count
+                    else:
+                        print('*** NO SHOT 1 SURVEY INFO ERROR for site: {0} shot: 1'.format(s[0]))
 
             for wed_ss_row in wed_sub_site_survey_info:
 
@@ -276,7 +287,7 @@ def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
                 elif extraDataType == 'no_shot_fish':
 
                     write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, 'No Fish', '', '', '', 0, 0, '', '', '', '', '', '', s[7], '')
-                    print('*** ADDED NO SHOT FISH for site: {0} shot: {1}'.format(s[0], s[1]))
+                    print('*** ADDED NO FISH SHOT for site: {0} shot: {1}'.format(s[0], s[1]))
 
                 r_count += 1
     return r_count

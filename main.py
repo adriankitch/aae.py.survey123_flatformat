@@ -392,6 +392,19 @@ for smp in sample_list:
                 ss_row.percent_duty_cycle = percent_duty_cycle
 
                 row_count += 1
+    else:
+        samples_present = False
+        sample_id = smp[1]
+        sample_site_id = smp[16]
+        section_number = '0' if smp[2] is None else smp[2]
+
+        if section_number != '0':
+            # test if the shot exisit in the shot list and add if it isn't
+            site_shot_list = list(filter(lambda x: x[0] == sample_site_id and x[1] == section_number, func.sssoc_info))
+            if len(site_shot_list) == 0:
+                func.sssoc_info.append(cls.SiteObs(sample_site_id, section_number, '', 0, 0, 0, 'IN SAMPLE INFO', ''))
+        else:
+            print('*** SPECIES NAME ERROR IN SAMPLES: Site: {0}'.format(sample_id))
 
 
 # #####################################################################################################################
@@ -411,10 +424,9 @@ row_count = func.extra_record_output(ws_write, prev_sample_site_id, row_count)
 #         row_count = func.extra_record_output_no_fish_shot(ws_write, sobs[0], sobs[1], row_count)
 for sobs in func.sssoc_info:
     site_section_list = list(filter(lambda x: x[0] == sobs[0] and x[1] == int(sobs[1]), func.site_section_used))
-    # print('Obs data: Site {0} Shot {1} site_used_len: {2}'.format(sobs[0], sobs[1], len(site_section_list)))
+    # print('Obs data: Site {0} Shot {1} Sp: {2} Obs_ID: {3} site_used_len: {4}'.format(sobs[0], sobs[1], sobs[2], sobs[7], len(site_section_list)))
     if len(site_section_list) == 0 and sobs[2] == '' and sobs[7] == '':
         row_count = func.extra_record_output_no_fish_shot(ws_write, sobs[0], sobs[1], row_count)
-
 
 # ADD any no samples fish sites
 prev_site_id = ''
@@ -430,7 +442,9 @@ for sobs in func.sssoc_info:
 
     prev_site_id = sobs[0]
 
+
 func.sheet_sort_rows(ws_write, 2, 0, [47, 7, 18, 27, 32, 31])
+
 func.set_col_date_style(ws_write, (7-1))
 
 row_count = 1
