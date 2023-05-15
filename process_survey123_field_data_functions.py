@@ -192,7 +192,7 @@ def extra_record_output(ws, ero_site_id, ero_row_count):
 
     # ######### OUTPUT ANY EXTRA FISH CAUGHT BUT NOT MEASURED ######################################
     ## x[5] is collected_left count
-    sub_sssoc_info = list(filter(lambda x: x[0] == ero_site_id and x[5] > 0, sssoc_info))
+    sub_sssoc_info = list(filter(lambda x: x[0] == ero_site_id and x[5] > 0 and x[6] != 'IN SAMPLE INFO', sssoc_info))
 
     ero_row_count = write_extra_data(ws, sub_sssoc_info, ero_row_count, 'extra_caught')
 
@@ -232,21 +232,21 @@ def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
 
             wed_sub_site_survey_info = list(filter(lambda x: x['k_site_id'] == s[0] and x['k_section_number'] == s[1], site_survey_info))
             # print(s[0], s[1])
-            if extraDataType == "extra_caught":
+            if extraDataType == 'extra_caught':
                 if len(wed_sub_site_survey_info) > 1:
-                    print('*** SURVEY ERROR GETTING EXTRA CAUGHT for site: {0} shot: {1}'.format(s[0], s[1]))
+                    print('*** MULTIPLE SURVEY ERROR GETTING EXTRA CAUGHT for site: {0} shot: {1}'.format(s[0], s[1]))
 
             elif extraDataType == 'observed':
                 if len(wed_sub_site_survey_info) > 1:
-                    print('*** SURVEY ERROR GETTING OBSERVED for site: {0} shot: {1}'.format(s[0], s[1]))
+                    print('*** MULTIPLE SURVEY ERROR GETTING OBSERVED for site: {0} shot: {1}'.format(s[0], s[1]))
 
             elif extraDataType == 'no_fish':
                 if len(wed_sub_site_survey_info) > 1:
-                    print('*** SURVEY ERROR GETTING NO FISH for site: {0} shot: {1}'.format(s[0], s[1]))
+                    print('*** MULTIPLE SURVEY ERROR GETTING NO FISH for site: {0} shot: {1}'.format(s[0], s[1]))
 
             elif extraDataType == 'no_shot_fish':
                 if len(wed_sub_site_survey_info) > 1:
-                    print('*** SURVEY ERROR GETTING NO SHOT FISH for site: {0} shot: {1}'.format(s[0], s[1]))
+                    print('*** MULTIPLE SURVEY ERROR GETTING NO SHOT FISH for site: {0} shot: {1}'.format(s[0], s[1]))
 
             for wed_ss_row in wed_sub_site_survey_info:
 
@@ -261,18 +261,22 @@ def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
                 if extraDataType == 'extra_caught':
 
                     write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', s[5], 0, '', '', '', '', '', '', s[7], '')
+                    print('*** ADDED EXTRA CAUGHT for site: {0} shot: {1} species: {2}'.format(s[0], s[1], s[2]))
 
                 elif extraDataType == 'observed':
 
                     write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', 0, s[4], '', '', '', '', '', '', s[7], '')
+                    print('Notice: Added OBSERVED for site: {0} shot: {1} species: {2}'.format(s[0], s[1], s[2]))
 
                 elif extraDataType == 'no_fish':
 
                     write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', 0, 0, '', '', '', '', '', '', s[7], '')
+                    print('*** ADDED NO FISH for site: {0} shot: {1}'.format(s[0], s[1]))
 
                 elif extraDataType == 'no_shot_fish':
 
                     write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, 'No Fish', '', '', '', 0, 0, '', '', '', '', '', '', s[7], '')
+                    print('*** ADDED NO SHOT FISH for site: {0} shot: {1}'.format(s[0], s[1]))
 
                 r_count += 1
     return r_count
