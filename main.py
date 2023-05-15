@@ -276,7 +276,6 @@ func.write_row(ws_write, row_count, 1, xl_header)
 row_count += 1
 
 prev_sample_site_id = ''
-prev_sample_id = ''
 shots_used = []
 
 samples_present = False
@@ -298,11 +297,6 @@ for smp in sample_list:
     if smp[3] is not None or smp[4] is not None:
         samples_present = True
         sample_id = smp[1]
-
-        if sample_id == 'ad53639c-e10d-44ae-826a-d4674c412062':
-            prev_sample_id = 'ad53639c-e10d-44ae-826a-d4674c412062'
-
-        prev_sample_id = sample_id
 
         section_number = 0 if smp[2] is None else smp[2]
         # #        if smp[2] is not None:
