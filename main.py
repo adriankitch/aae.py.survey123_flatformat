@@ -180,6 +180,10 @@ for svy in survey_list:
                             observed = 0
                         if collected != 0 or observed != 0:
                             func.sssoc_info.append(cls.SiteObs(site_id, section_number, species, collected, observed, collected, shot_id, obs_id))
+                        else:
+                            #sometimes only a single fish has been recorded in observed without coll or obs. Make the shot is in the list
+                            if section_condition == 'yes':  # and len(site_samples) >= 0:
+                                func.sssoc_info.append(cls.SiteObs(site_id, section_number, '', 0, 0, 0, shot_id, ''))
 
             else:
                 # # If no obs hit but shot exists then include shot
@@ -405,9 +409,9 @@ row_count = func.extra_record_output(ws_write, prev_sample_site_id, row_count)
 # for sobs in func.sssoc_info:
 #     if sobs[1] not in shots_used and sobs[2] == '' and sobs[7] == '':
 #         row_count = func.extra_record_output_no_fish_shot(ws_write, sobs[0], sobs[1], row_count)
-
 for sobs in func.sssoc_info:
     site_section_list = list(filter(lambda x: x[0] == sobs[0] and x[1] == int(sobs[1]), func.site_section_used))
+    # print('Obs data: Site {0} Shot {1} site_used_len: {2}'.format(sobs[0], sobs[1], len(site_section_list)))
     if len(site_section_list) == 0 and sobs[2] == '' and sobs[7] == '':
         row_count = func.extra_record_output_no_fish_shot(ws_write, sobs[0], sobs[1], row_count)
 
