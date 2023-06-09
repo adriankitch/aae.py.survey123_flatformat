@@ -404,7 +404,7 @@ for smp in sample_list:
             if len(site_shot_list) == 0:
                 func.sssoc_info.append(cls.SiteObs(sample_site_id, section_number, '', 0, 0, 0, 'IN SAMPLE INFO', ''))
         else:
-            print('*** SPECIES NAME ERROR IN SAMPLES: Site: {0}'.format(sample_id))
+            print('*** SPECIES NAME ERROR IN SAMPLES: {0}'.format(sample_id))
 
 
 # #####################################################################################################################
