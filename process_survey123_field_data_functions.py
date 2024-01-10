@@ -14,6 +14,25 @@ sssoc_info = []  # site survey section observed collected
 site_section_used = []
 
 
+def read_in_excel_tab(wkbook_sheet):
+    sheet = wkbook_sheet
+    print('reading in {0}'.format(sheet.title))
+
+    sheet_list = []
+    i = 0
+
+    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=2, max_col=sheet.max_column, values_only=True):
+        sheet_list.append(row)
+
+    return sheet_list
+
+
+def read_in_excel_tab_header(wkbook_sheet):
+    sheet = wkbook_sheet
+    for row in sheet.iter_rows(min_row=1, max_row=1, min_col=2, max_col=sheet.max_column, values_only=True):
+        return row
+
+
 gear_types = {
     "1E Large": "EF_LB",
     "2E Large": "EF_LB",
@@ -34,114 +53,107 @@ gear_types = {
     "Bank Mounted": "EF_BM",
     "Back Pack": "EF_BP",
     "Unknown": "Unknown",
-    "EXTRA_SHOT_IN_SAMPLES":"EXTRA_SHOT_IN_SAMPLES"
+    "EXTRA_SHOT_IN_SAMPLES": "EXTRA_SHOT_IN_SAMPLES"
 }
 
 
-def get_random_shot(rs_site_id, rs_species):
+def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
+    skip_next = 0
 
-    sp_col_found = 0
-
-    # # Filter for shots with collected species at site
-    rs_sub_sssoc_info = list(filter(lambda x: x[0] == rs_site_id and x[2] == rs_species and x[5] > 0, sssoc_info))
-    # #    sub_sssoc_info = list(filter(lambda x: x__getitem__(0) == site_id and x__getitem__(2) == species and x__getitem__(5) > 0, sssoc_info))
+    # Filter completed data for shots with collected species at correct site and collected > 0:
+    rs_sub_shots = list(filter(lambda x: x.shots[shot_header.index('ParentGlobalID')] == rs_site_id and x.observations[
+        obs_header.index('species_obs')] == rs_species and x.observations[obs_header.index('section_collected')] > 0,
+                               output))
     shotlist = []
-    # print(str(len(rs_sub_sssoc_info)))
-    if rs_sub_sssoc_info is None or len(rs_sub_sssoc_info) == 0:
+
+    if rs_sub_shots is None or len(rs_sub_shots) == 0:
         print('Notice: No collected {0} available in shots for site {1}'.format(rs_species, rs_site_id))
 
-    if len(rs_sub_sssoc_info) > 0:
-        # #        print('step 1')
-        sp_col_found = 1
+    # If matches are found with Site, Species and Collected > 0:
+    if len(rs_sub_shots) > 0:
+        skip_next = 1
         prev_section_number = 0
-        for rs_i in rs_sub_sssoc_info:
-            if prev_section_number != rs_i.section_number:
-                shotlist.append(rs_i.section_number)
-                prev_section_number = rs_i.section_number
 
-    if sp_col_found == 0:
-        # # print('step 2')
-        # # Filter for shots with species at site
-        rs_sub_sssoc_info = list(filter(lambda x: x[0] == rs_site_id and x[2] == rs_species, sssoc_info))
-        shotlist = []
+        for rs_i in rs_sub_shots:
+            if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
+                shotlist.append(rs_i)
+                prev_section_number = rs_i.shots[shot_header.index('section_number')]
 
-        if len(rs_sub_sssoc_info) > 0:
-            sp_col_found = 1
+    # If matches found with only site and species:
+    if skip_next == 0:
+        rs_sub_shots = list(filter(
+            lambda x: x.shots[shot_header.index('ParentGlobalID')] == rs_site_id and x.observations[
+                obs_header.index('species_obs')] == rs_species, output))
+
+        if len(rs_sub_shots) > 0:
+            skip_next = 1
             prev_section_number = 0
-            for rs_i in rs_sub_sssoc_info:
-                if prev_section_number != rs_i.section_number:
-                    shotlist.append(rs_i.section_number)
-                    prev_section_number = rs_i.section_number
 
-    if sp_col_found == 0:
-        # print('step 3')
-        # # Filter for shots at site
-        # sub_sssoc_info = list(filter(lambda x: x[0] == rs_site_id and x[2] != 'No Fish', sssoc_info))
-        sub_sssoc_info = list(filter(lambda x: x[0] == rs_site_id, sssoc_info))
+            for rs_i in rs_sub_shots:
+                if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
+                    shotlist.append(rs_i)
+                    prev_section_number = rs_i.shots[shot_header.index('section_number')]
 
-        # print(rs_site_id)
+    # If only site match is found:
+    if skip_next == 0:
+        sub_sssoc_info = list(filter(lambda x: x.shots[shot_header.index('ParentGlobalID')] == rs_site_id, output))
 
-
-        shotlist = []
-        # print(len(sub_sssoc_info))
-        if len(sub_sssoc_info) > 0:
-            # sp_col_found = 1
+        if len(rs_sub_shots) > 0:
             prev_section_number = 0
-            for rs_i in sub_sssoc_info:
-                if prev_section_number != rs_i.section_number:
-                    shotlist.append(rs_i.section_number)
-                    prev_section_number = rs_i.section_number
-        # print(len(shotlist))
+            for rs_i in rs_sub_shots:
+                if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
+                    shotlist.append(rs_i)
+                    prev_section_number = rs_i.shots[shot_header.index('section_number')]
 
-    if rs_sub_sssoc_info is None or len(shotlist) == 0:
+    if rs_sub_shots is None or len(shotlist) == 0:
         print('Notice: *** No {0}: {1} available'.format(rs_site_id, rs_species))
+        return False
     else:
         return random.choice(shotlist)
 
-def read_in_excel_tab(wkbook_sheet):
-    sheet = wkbook_sheet
-    print('reading in {0}'.format(sheet.title))
 
-    sheet_list = []
-    i = 0
+def adjust_species_count(current, raw_data, PGID, section_num, species, svy_header, obs_header, sample_header,
+                         shot_header, tally_results, tally_header):
+    for completed in raw_data:
+        # Check that site, section and species match:
+        if PGID == completed.surveys[svy_header.index('GlobalID')]:
+            if section_num == completed.shots[shot_header.index('section_number')] or section_num == completed.samples[
+                sample_header.index('section_number_samp')]:
+                if species == completed.observations[obs_header.index('species_obs')]:
+                    # Adjust accordingly
 
-    for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column, values_only=True):
-        # #    print(row[0])
-        if i > 0:
-            sheet_list.append(row)
-        i = 1
+                    if current[sample_header.index('collected')] is None:
+                        collected_new = 1
+                    else:
+                        collected_new = current[sample_header.index('collected')]
 
-    return sheet_list
+                    if collected_new > 1:
+                        completed.observations[obs_header.index('section_collected')] -= collected_new
 
-def adjust_species_shot(ass_site_id, ass_species, ass_section_number, ass_collected):
+                    else:
+                        completed.observations[obs_header.index('section_collected')] -= 1
 
-    found_data = False
-    for ass_i in sssoc_info:
+                    # Adjust Collected_Tally accordingly:
+                    # Find tally data with the same PGID, section_num and species:
+                    for tally in tally_results:
 
-        # #        count = 0
-        if ass_site_id == ass_i[0] and ass_section_number == ass_i[1] and ass_species == ass_i[2]:
-            # #                print('{0},{1},{2},{3}'.format(i[0], i[1], i[2], i[5]))
-            found_data = True
-            if ass_collected is None:
-                ass_collected = 1
+                        if tally[tally_header.index('Site_ID')] == PGID:
+                            if tally[tally_header.index('Section_Number')] == section_num:
+                                if tally[tally_header.index('Species')] == species:
+                                    # Alter collected_tally:
+                                    tally[tally_header.index('Collected_Tally')] = completed.observations[
+                                        obs_header.index('section_collected')]
 
-            if ass_collected > 1:
-                ass_i[5] = ass_i[5] - ass_collected
-            else:
-                ass_i[5] = ass_i[5] - 1
-            return ass_i[5]
-    # #        count = count + 1
+                    return
+    return
 
-    if not found_data:
-        sssoc_info.append(cls.SiteObs(ass_site_id, ass_section_number, ass_species, 0, 0, ass_collected, 'IN SAMPLE INFO', ''))
-
-    return -1
 
 def write_row(write_sheet, row_num: int, starting_column: str or int, write_values: list):
     if isinstance(starting_column, str):
         starting_column = ord(starting_column.lower()) - 96
     for wr_i, value in enumerate(write_values):
         write_sheet.cell(row_num, starting_column + wr_i, value)
+
 
 def sheet_sort_rows(ws, row_start, row_end=0, cols=None, sorter=None, reverse=False):
     # #""" Sorts given rows of the sheet
@@ -158,10 +170,10 @@ def sheet_sort_rows(ws, row_start, row_end=0, cols=None, sorter=None, reverse=Fa
         row_end = ws.max_row
     right = openpyxl.utils.get_column_letter(ws.max_column)
     if cols is None:
-        cols = range(1, ws.max_column+1)
+        cols = range(1, ws.max_column + 1)
 
     array = {}
-    for ssr_row in range(row_start, row_end+1):
+    for ssr_row in range(row_start, row_end + 1):
         key = []
         for col in cols:
             key.append(ws.cell(ssr_row, col).value)
@@ -179,17 +191,17 @@ def sheet_sort_rows(ws, row_start, row_end=0, cols=None, sorter=None, reverse=Fa
             ws.move_range(f"A{src}:{right}{src}", dist)
             dest += 1
 
-def set_col_date_style(ws, col_index):
 
+def set_col_date_style(ws, col_index):
     # create date style:
     date_style = NamedStyle(name='date_style', number_format='YYYY-MM-DD')
 
     for cds_row in ws[2:ws.max_row]:  # skip the header
-        cell = cds_row[col_index]             # column H
+        cell = cds_row[col_index]  # column H
         cell.style = date_style
 
-def extra_record_output(ws, ero_site_id, ero_row_count):
 
+def extra_record_output(ws, ero_site_id, ero_row_count):
     # ######### OUTPUT ANY EXTRA FISH CAUGHT BUT NOT MEASURED ######################################
     ## x[5] is collected_left count
     sub_sssoc_info = list(filter(lambda x: x[0] == ero_site_id and x[5] > 0 and x[6] != 'IN SAMPLE INFO', sssoc_info))
@@ -212,16 +224,17 @@ def extra_record_output(ws, ero_site_id, ero_row_count):
     # #                    print('no hit for shot 8')
     ero_row_count = write_extra_data(ws, sub_sssoc_info, ero_row_count, 'no_fish')
 
-
     return ero_row_count
+
 
 def extra_record_output_no_fish_shot(ws, ero_site_id, ero_section_number, ero_row_count):
     sub_sssoc_info = list(filter(lambda x: x[0] == ero_site_id and x[1] == str(ero_section_number), sssoc_info))
     ero_row_count = write_extra_data(ws, sub_sssoc_info, ero_row_count, 'no_shot_fish')
 
     return ero_row_count
-def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
 
+
+def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
     if len(wed_sub_sssoc_info) > 0:
         for s in wed_sub_sssoc_info:
 
@@ -230,7 +243,8 @@ def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
                 # #                            print('converting shot')
                 wed_shot_i = int(wed_shot_i)
 
-            wed_sub_site_survey_info = list(filter(lambda x: x['k_site_id'] == s[0] and x['k_section_number'] == str(s[1]), site_survey_info))
+            wed_sub_site_survey_info = list(
+                filter(lambda x: x['k_site_id'] == s[0] and x['k_section_number'] == str(s[1]), site_survey_info))
             # print(s[0], s[1])
             if extraDataType == 'extra_caught':
                 if len(wed_sub_site_survey_info) > 1:
@@ -249,10 +263,12 @@ def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
                     print('*** MULTIPLE SURVEY ERROR GETTING NO SHOT FISH for site: {0} shot: {1}'.format(s[0], s[1]))
 
                 elif len(wed_sub_site_survey_info) == 0:
-                    wed_sub_site_survey_info = list(filter(lambda x: x['k_site_id'] == s[0] and x['k_section_number'] == '1', site_survey_info))
+                    wed_sub_site_survey_info = list(
+                        filter(lambda x: x['k_site_id'] == s[0] and x['k_section_number'] == '1', site_survey_info))
                     if len(wed_sub_site_survey_info) > 0:
                         # wed_sub_site_survey_info[0]
-                        write_excel_row(ws_out, r_count, wed_sub_site_survey_info[0], int(s[1]), 'No Fish', '', '', '', 0, 0, '', '', '', '', '', '', s[7], '')
+                        write_excel_row(ws_out, r_count, wed_sub_site_survey_info[0], int(s[1]), 'No Fish', '', '', '',
+                                        0, 0, '', '', '', '', '', '', s[7], '')
                         print('*** ADDED EXTRA SHOT WITH NO FISH for site: {0} shot: {1}'.format(s[0], s[1]))
                         r_count += 1
                         return r_count
@@ -271,29 +287,35 @@ def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
                 # #    7: self.obs_id
                 if extraDataType == 'extra_caught':
 
-                    write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', s[5], 0, '', '', '', '', '', '', s[7], '')
+                    write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', s[5], 0, '', '', '', '',
+                                    '', '', s[7], '')
                     print('*** ADDED EXTRA CAUGHT for site: {0} shot: {1} species: {2}'.format(s[0], s[1], s[2]))
 
                 elif extraDataType == 'observed':
 
-                    write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', 0, s[4], '', '', '', '', '', '', s[7], '')
+                    write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', 0, s[4], '', '', '', '',
+                                    '', '', s[7], '')
                     print('Notice: Added OBSERVED for site: {0} shot: {1} species: {2}'.format(s[0], s[1], s[2]))
 
                 elif extraDataType == 'no_fish':
 
-                    write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', 0, 0, '', '', '', '', '', '', s[7], '')
+                    write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, s[2], '', '', '', 0, 0, '', '', '', '', '',
+                                    '', s[7], '')
                     print('*** ADDED NO FISH for site: {0} shot: {1}'.format(s[0], s[1]))
 
                 elif extraDataType == 'no_shot_fish':
 
-                    write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, 'No Fish', '', '', '', 0, 0, '', '', '', '', '', '', s[7], '')
+                    write_excel_row(ws_out, r_count, wed_ss_row, wed_shot_i, 'No Fish', '', '', '', 0, 0, '', '', '',
+                                    '', '', '', s[7], '')
                     print('*** ADDED NO FISH SHOT for site: {0} shot: {1}'.format(s[0], s[1]))
 
                 r_count += 1
     return r_count
 
-def write_excel_row(wsheet, rowcount, data_row, shot_num, wer_species, wer_fl, wer_tl, wer_w, wer_coll, wer_obs, wer_recapture, wer_pit, wer_external_tag_no, wer_genetics_label, wer_otoliths_label, wer_fauna_notes, wer_obst_id, wer_sample_id):
 
+def write_excel_row(wsheet, rowcount, data_row, shot_num, wer_species, wer_fl, wer_tl, wer_w, wer_coll, wer_obs,
+                    wer_recapture, wer_pit, wer_external_tag_no, wer_genetics_label, wer_otoliths_label,
+                    wer_fauna_notes, wer_obst_id, wer_sample_id):
     if data_row['k_section_condition'].lower() == 'yes':
         section_condition_xl = 'FISHABLE'
     else:
@@ -302,21 +324,32 @@ def write_excel_row(wsheet, rowcount, data_row, shot_num, wer_species, wer_fl, w
     personnel1 = data_row['k_personnel1']
     personnel2 = data_row['k_personnel2']
 
-    #remove the common name within brackets
+    # remove the common name within brackets
     wer_species = re.sub(r'\(.*?\) *', '', wer_species)
     wer_species = wer_species.strip()
 
     wer_gear_type = gear_types[data_row.gear_type]
 
-##    wer_gear_type = data_row.gear_type #gear_types[data_row['k_gear_type']] if data_row['k_gear_type'] == data_row.gear_type else data_row.gear_type
+    ##    wer_gear_type = data_row.gear_type #gear_types[data_row['k_gear_type']] if data_row['k_gear_type'] == data_row.gear_type else data_row.gear_type
 
     if data_row['k_survey_notes'] is None:
         wer_survey_notes = 'gear: {0}'.format(data_row['k_gear_type'])
     else:
         wer_survey_notes = '{0}, gear: {1}'.format(data_row['k_survey_notes'], data_row['k_gear_type'])
 
-    wer_xl_row = list((data_row['k_project_name'], data_row['k_site_code'], data_row['k_x_start'], data_row['k_y_start'], data_row['k_x_finish'], data_row['k_y_finish'], data_row['k_survey_date'], wer_gear_type, personnel1, personnel2, data_row['k_depth_secchi'], data_row['k_depth_max'], data_row['k_depth_avg'], section_condition_xl, data_row['k_time_start'], data_row['k_time_end'], wer_survey_notes, shot_num, data_row['k_electro_seconds'], data_row['k_soak_minutes_per_unit'], data_row.section_time_start, data_row.section_time_end, data_row.volts, data_row.amps, data_row.pulses_per_second, data_row.percent_duty_cycle, wer_species, wer_fl, wer_tl, wer_w, wer_coll, wer_obs, wer_recapture, wer_pit, wer_external_tag_no, wer_genetics_label, wer_otoliths_label, wer_fauna_notes, data_row['k_water_qual_depth'], data_row['k_ec_25c'], data_row['k_water_temp'], data_row['k_do_mgl'], data_row['k_do_perc'], data_row['k_ph'], data_row['k_turbidity_ntu'], data_row['k_chlorophyll'], data_row['k_site_id'], data_row['k_shot_id'], wer_obst_id, wer_sample_id, data_row['k_data_x'], data_row['k_data_y']))
+    wer_xl_row = list((
+                      data_row['k_project_name'], data_row['k_site_code'], data_row['k_x_start'], data_row['k_y_start'],
+                      data_row['k_x_finish'], data_row['k_y_finish'], data_row['k_survey_date'], wer_gear_type,
+                      personnel1, personnel2, data_row['k_depth_secchi'], data_row['k_depth_max'],
+                      data_row['k_depth_avg'], section_condition_xl, data_row['k_time_start'], data_row['k_time_end'],
+                      wer_survey_notes, shot_num, data_row['k_electro_seconds'], data_row['k_soak_minutes_per_unit'],
+                      data_row.section_time_start, data_row.section_time_end, data_row.volts, data_row.amps,
+                      data_row.pulses_per_second, data_row.percent_duty_cycle, wer_species, wer_fl, wer_tl, wer_w,
+                      wer_coll, wer_obs, wer_recapture, wer_pit, wer_external_tag_no, wer_genetics_label,
+                      wer_otoliths_label, wer_fauna_notes, data_row['k_water_qual_depth'], data_row['k_ec_25c'],
+                      data_row['k_water_temp'], data_row['k_do_mgl'], data_row['k_do_perc'], data_row['k_ph'],
+                      data_row['k_turbidity_ntu'], data_row['k_chlorophyll'], data_row['k_site_id'],
+                      data_row['k_shot_id'], wer_obst_id, wer_sample_id, data_row['k_data_x'], data_row['k_data_y']))
 
     write_row(wsheet, rowcount, 1, wer_xl_row)
-
 
