@@ -66,7 +66,7 @@ import openpyxl
 from openpyxl import load_workbook
 import process_survey123_field_data_classes as cls
 import process_survey123_field_data_functions as func
-# import local_vars as localvars
+import local_vars as localvars #local_vars.py is py file holding local paths (is git ignored)
 from tkinter import *
 import tkinter.messagebox
 from tkinter.filedialog import askopenfilename  # as fd
@@ -76,8 +76,8 @@ root = Tk()
 root.withdraw()
 root.update()
 
-# io_path = localvars.io_path
-filename = askopenfilename(initialdir="C:/", title="Open Survey123 XLSX File")
+io_path = localvars.io_path
+filename = askopenfilename(initialdir=io_path, title="Open Survey123 XLSX File")
 in_xlfile = os.path.basename(filename)
 io_path = filename.replace(in_xlfile, '')
 
