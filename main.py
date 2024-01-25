@@ -71,6 +71,7 @@ from tkinter import *
 import tkinter.messagebox
 from tkinter.filedialog import askopenfilename  # as fd
 import random
+import re
 
 root = Tk()
 root.withdraw()
@@ -267,9 +268,13 @@ for svy in survey_list:
 
 
                     else:
+
+                        # Add a 'no fish' obs if no obs in the orig data
                         if survey_list_current[survey_list_header.index('section_condition')] == 'yes':
-                            if obs_list_current[obs_list_header.index('section_collected')] is None:
-                                obs_list_current[obs_list_header.index('section_collected')] = 0
+                            obs_list_current = [None] * len(obs_list_header)
+                            obs_list_current[obs_list_header.index('section_collected')] = 0
+                            obs_list_current[obs_list_header.index('species_obs')] = 'No Fish'
+                            sample_list_current[sample_list_header.index('species_samp')] = 'No Fish'
                             # Build object for output
                             # Find ID Indices:
                             ID_Indices = [survey_list_header.index('GlobalID'),
@@ -350,14 +355,18 @@ for smp in sample_list:
 
             # Find random shot to attribute sample to with same ParentGlobalID and Species.
             site_id = sample_list_current[sample_list_header.index('ParentGlobalID')]
+
+            # If a shot is already asigned then set to 0 to get a random shot
+            section_number = (0 if sample_list_current[sample_list_header.index('section_number_samp')] is None else sample_list_current[sample_list_header.index('section_number_samp')])
+
+##            if section_number == 0:
             rand_pick = func.get_random_shot(site_id, species, raw_data, obs_list_header, shot_list_header)
 
             # If a shot is found:
             if rand_pick != False:
                 # Fix collected number:
-                section_num = (
-                    0 if rand_pick.shots[shot_list_header.index('section_number')] is None else rand_pick.shots[
-                        shot_list_header.index('section_number')])
+                section_num = (rand_pick.shots[shot_list_header.index('section_number')]
+                    if section_number == 0 else section_number)
                 if sample_list_current[sample_list_header.index('collected')] is None or sample_list_current[
                     sample_list_header.index('collected')] == 0:
                     sample_list_current[sample_list_header.index('collected')] = 1
@@ -398,6 +407,12 @@ for smp in sample_list:
                 # Generate extra shot.
                 pass
 
+        else:
+            print('SAMPLE SKIPPED - GlobalID: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]))
+
+
+### NEED TO ADD EXTRA NO FISH SHOTS
+
 # Correctly format and order entries as list at top of code.
 for obj in raw_data:
     survey_list_header_edit = obj.order(obj.surveys, survey_template, survey_list_header, 'survey')
@@ -409,13 +424,14 @@ for obj in raw_data:
 print('Collating data...')
 raw_data_header = survey_list_header_edit + loc_list_header_edit + shot_list_header_edit + obs_list_header_edit + sample_list_header_edit
 # Append GlobalID List and creator:
-raw_data_header += ['Survey_GlobalID', 'Site_GlobalID', 'Shot_GlobalID', 'Obs_GlobalID', 'Sample_GlobalID', 'Creator']
+raw_data_header += ['Site_GlobalID', 'Loc_GlobalID', 'Shot_GlobalID', 'Obs_GlobalID', 'Sample_GlobalID', 'Creator']
 
 for i in raw_data:
     i.collate(raw_data_header)
 
 raw_data_header.pop(raw_data_header.index('species_samp'))
 raw_data_header[raw_data_header.index('species_obs')] = 'species'
+func.populate_extra_collected(raw_data, raw_data_header)
 
 print('Processing data into new format...')
 
@@ -431,6 +447,10 @@ row_count = 1
 func.write_row(ws_write, row_count, 1, raw_data_header)
 for result in raw_data:
     row_count += 1
+    wer_species = result.collation[raw_data_header.index('species')]
+    wer_species = re.sub(r'\(.*?\) *', '', wer_species)
+    wer_species = wer_species.strip()
+    result.collation[raw_data_header.index('species')] = wer_species
     func.write_row(ws_write, row_count, 1, tuple(result.collation))
 # Tally Data:
 row_count = 1

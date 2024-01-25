@@ -94,16 +94,16 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
                     shotlist.append(rs_i)
                     prev_section_number = rs_i.shots[shot_header.index('section_number')]
 
-    # If only site match is found:
+    # If only site match is found (excluding 'no fish' shots):
     if skip_next == 0:
-        sub_sssoc_info = list(filter(lambda x: x.shots[shot_header.index('ParentGlobalID')] == rs_site_id, output))
-
+        rs_sub_shots = list(filter(lambda x: x.shots[shot_header.index('ParentGlobalID')] == rs_site_id and x.observations[obs_header.index('species_obs')] != 'No Fish', output))
         if len(rs_sub_shots) > 0:
             prev_section_number = 0
             for rs_i in rs_sub_shots:
                 if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
                     shotlist.append(rs_i)
                     prev_section_number = rs_i.shots[shot_header.index('section_number')]
+
 
     if rs_sub_shots is None or len(shotlist) == 0:
         print('Notice: *** No {0}: {1} available'.format(rs_site_id, rs_species))
@@ -147,6 +147,14 @@ def adjust_species_count(current, raw_data, PGID, section_num, species, svy_head
                     return
     return
 
+
+def populate_extra_collected(raw_data, raw_header):
+  for rw in raw_data:
+    if rw.collation[raw_header.index('section_collected')] > 0 and rw.collation[raw_header.index('collected')] is None:
+        rw.collation[raw_header.index('collected')] = rw.collation[raw_header.index('section_collected')]
+        # print('ID: {0} - s_coll: {1}, coll: {2}'.format(rw.collation[raw_header.index('Obs_GlobalID')], rw.collation[raw_header.index('section_collected')], rw.collation[raw_header.index('collected')]))
+
+  return
 
 def write_row(write_sheet, row_num: int, starting_column: str or int, write_values: list):
     if isinstance(starting_column, str):
