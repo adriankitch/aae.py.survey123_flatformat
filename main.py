@@ -445,8 +445,9 @@ raw_data_header[raw_data_header.index('species_obs')] = 'species'
 func.populate_extra_collected(raw_data, raw_data_header)
 
 
+
 for i in raw_data[:]:
-    if i.collation[raw_data_header.index('section_collected')] <= 0 and i.collation[raw_data_header.index('observed')] == 0 and i.collation[raw_data_header.index('collected')] is None:
+    if i.collation[raw_data_header.index('species')].lower() != 'no fish' and i.collation[raw_data_header.index('section_collected')] <= 0 and i.collation[raw_data_header.index('observed')] == 0 and i.collation[raw_data_header.index('collected')] is None:
         ob_id = i.collation[raw_data_header.index('Obs_GlobalID')]
         raw_data.remove(i)
         print('*** REMOVED Obs Record (Negative collected, Zero Observed): {0}'.format(ob_id))
