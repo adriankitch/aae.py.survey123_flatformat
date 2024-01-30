@@ -122,11 +122,13 @@ def adjust_species_count(current, raw_data, PGID, section_num, species, svy_head
                 if species == completed.observations[obs_header.index('species_obs')]:
                     # Adjust accordingly
 
+                    #if no collected is set in samples
                     if current[sample_header.index('collected')] is None:
                         collected_new = 1
                     else:
                         collected_new = current[sample_header.index('collected')]
 
+                    #reduced the obs section collected by sample collected value
                     if collected_new > 1:
                         completed.observations[obs_header.index('section_collected')] -= collected_new
 
