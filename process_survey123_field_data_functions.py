@@ -52,6 +52,8 @@ gear_types = {
     "12ft Tinny": "12ft Tinny",
     "Bank Mounted": "EF_BM",
     "Back Pack": "EF_BP",
+    "EF_BP_LARV": "EF_BP_LARV",
+    "Net": "Net",
     "Unknown": "Unknown",
     "EXTRA_SHOT_IN_SAMPLES": "EXTRA_SHOT_IN_SAMPLES"
 }
@@ -106,7 +108,7 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
 
 
     if rs_sub_shots is None or len(shotlist) == 0:
-        print('Notice: *** No {0}: {1} available'.format(rs_site_id, rs_species))
+        print('*** ERROR: No {0} available: SiteID {1}'.format(rs_species, rs_site_id))
         return False
     else:
         return random.choice(shotlist)
@@ -146,9 +148,38 @@ def adjust_species_count(current, raw_data, PGID, section_num, species, svy_head
                                     tally[tally_header.index('Collected_Tally')] = completed.observations[
                                         obs_header.index('section_collected')]
 
-                    return
+                                    return
+
+    #if species at site and shot isn't in the data
+    if current[sample_header.index('collected')] is None:
+        collected_new = 1
+    else:
+        collected_new = current[sample_header.index('collected')]
+    tally_results.append(
+        [PGID, section_num, species, collected_new, 0, collected_new, section_num, None, None])
+
     return
 
+
+def remove_unrequired_no_fish(raw_data, PGID, section_num, svy_header, obs_header, sample_header,
+                         shot_header, tally_results, tally_header):
+    for completed in raw_data:
+        # Check that site, section and species match:
+        if PGID == completed.surveys[svy_header.index('GlobalID')]:
+            if section_num == completed.shots[shot_header.index('section_number')] or section_num == completed.samples[
+                sample_header.index('section_number_samp')]:
+                if 'No Fish' == completed.observations[obs_header.index('species_obs')]:
+                    # Adjust accordingly
+                    raw_data.remove(completed)
+
+                    for item in tally_results:
+                        if PGID == item[tally_header.index('Site_ID')]:
+                            if section_num == item[tally_header.index('Section_Number')]:
+                                if 'No Fish' == item[tally_header.index('Species')]:
+                                    tally_results.remove(item)
+                                    return
+
+    return
 
 def populate_extra_collected(raw_data, raw_header):
   for rw in raw_data:
@@ -156,6 +187,15 @@ def populate_extra_collected(raw_data, raw_header):
         rw.collation[raw_header.index('collected')] = rw.collation[raw_header.index('section_collected')]
         # print('ID: {0} - s_coll: {1}, coll: {2}'.format(rw.collation[raw_header.index('Obs_GlobalID')], rw.collation[raw_header.index('section_collected')], rw.collation[raw_header.index('collected')]))
 
+  return
+
+def correct_net_gear_type(raw_data, raw_header):
+  for rw in raw_data:
+    if rw.collation[raw_header.index('gear_type')].lower() == 'net':
+        if rw.collation[raw_header.index('net')].lower() != 'ef':
+            rw.collation[raw_header.index('gear_type')] = rw.collation[raw_header.index('net')]
+        else:
+            print('*** ERROR Incorrect net type selected for shot id: {0}'.format(rw.collation[raw_header.index('Shot_GlobalID')]))
   return
 
 def write_row(write_sheet, row_num: int, starting_column: str or int, write_values: list):
