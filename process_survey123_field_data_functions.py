@@ -99,7 +99,21 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
     # If only site match is found (excluding 'no fish' shots):
     if skip_next == 0:
         rs_sub_shots = list(filter(lambda x: x.shots[shot_header.index('ParentGlobalID')] == rs_site_id and x.observations[obs_header.index('species_obs')] != 'No Fish', output))
+
         if len(rs_sub_shots) > 0:
+            skip_next = 1
+            prev_section_number = 0
+            for rs_i in rs_sub_shots:
+                if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
+                    shotlist.append(rs_i)
+                    prev_section_number = rs_i.shots[shot_header.index('section_number')]
+
+    # If only site match is found (but only one shot):
+    if skip_next == 0:
+        rs_sub_shots = list(filter(lambda x: x.shots[shot_header.index('ParentGlobalID')] == rs_site_id, output))
+
+        if len(rs_sub_shots) == 1:
+##            skip_next = 1
             prev_section_number = 0
             for rs_i in rs_sub_shots:
                 if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
@@ -108,7 +122,7 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
 
 
     if rs_sub_shots is None or len(shotlist) == 0:
-        print('*** ERROR: No {0} available: SiteID {1}'.format(rs_species, rs_site_id))
+        print('*** ERROR (shot selector function): No {0} available: SiteID {1}'.format(rs_species, rs_site_id))
         return False
     else:
         return random.choice(shotlist)
@@ -116,6 +130,9 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
 
 def adjust_species_count(current, raw_data, PGID, section_num, species, svy_header, obs_header, sample_header,
                          shot_header, tally_results, tally_header):
+
+    collected_new = 1 if current[sample_header.index('collected')] in [0, None] else current[sample_header.index('collected')]
+
     for completed in raw_data:
         # Check that site, section and species match:
         if PGID == completed.surveys[svy_header.index('GlobalID')]:
@@ -125,36 +142,37 @@ def adjust_species_count(current, raw_data, PGID, section_num, species, svy_head
                     # Adjust accordingly
 
                     #if no collected is set in samples
-                    if current[sample_header.index('collected')] is None:
-                        collected_new = 1
-                    else:
-                        collected_new = current[sample_header.index('collected')]
+##                    if current[sample_header.index('collected')] is None:
+##                        collected_new = 1
+##                    else:
+##                        collected_new = current[sample_header.index('collected')]
 
                     #reduced the obs section collected by sample collected value
-                    if collected_new > 1:
-                        completed.observations[obs_header.index('section_collected')] -= collected_new
+##                    if collected_new > 1:
+                    completed.observations[obs_header.index('section_collected')] -= collected_new
 
-                    else:
-                        completed.observations[obs_header.index('section_collected')] -= 1
+##                    else:
+##                        completed.observations[obs_header.index('section_collected')] -= 1
+                    break
 
-                    # Adjust Collected_Tally accordingly:
-                    # Find tally data with the same PGID, section_num and species:
-                    for tally in tally_results:
+        # Adjust Collected_Tally accordingly:
+        # Find tally data with the same PGID, section_num and species:
+    for completed in raw_data:
+        for tally in tally_results:
 
-                        if tally[tally_header.index('Site_ID')] == PGID:
-                            if tally[tally_header.index('Section_Number')] == section_num:
-                                if tally[tally_header.index('Species')] == species:
-                                    # Alter collected_tally:
-                                    tally[tally_header.index('Collected_Tally')] = completed.observations[
-                                        obs_header.index('section_collected')]
+            if tally[tally_header.index('Site_ID')] == PGID:
+                if tally[tally_header.index('Section_Number')] == section_num:
+                    if tally[tally_header.index('Species')] == species:
 
-                                    return
+                        # Alter collected_tally:
+                        tally[tally_header.index('Collected_Tally')] -= collected_new
+                        return
 
     #if species at site and shot isn't in the data
-    if current[sample_header.index('collected')] is None:
-        collected_new = 1
-    else:
-        collected_new = current[sample_header.index('collected')]
+##    if current[sample_header.index('collected')] is None:
+##        collected_new = 1
+##    else:
+##        collected_new = current[sample_header.index('collected')]
     tally_results.append(
         [PGID, section_num, species, collected_new, 0, collected_new, section_num, None, None])
 
@@ -198,11 +216,34 @@ def correct_net_gear_type(raw_data, raw_header):
             print('*** ERROR Incorrect net type selected for shot id: {0}'.format(rw.collation[raw_header.index('Shot_GlobalID')]))
   return
 
+def append_holder_sample_row(shot_current, loc_current, survey_current, species, raw_data, svy_header, loc_header, shot_header, obs_header, sample_header):
+    obs_current = [None] * len(obs_header)
+    obs_current[obs_header.index('section_collected')] = -1
+    obs_current[obs_header.index('observed')] = 0
+
+    sample_current = [None] * len(sample_header)
+    sample_current[sample_header.index('species_samp')] = species
+
+    ID_Indices = [svy_header.index('GlobalID'),
+                  loc_header.index('GlobalID'),
+                  shot_header.index('GlobalID'),
+                  obs_header.index('GlobalID'),
+                  sample_header.index('GlobalID'), ]
+    raw_data.append(cls.resultObject(survey_current,
+                                     loc_current,
+                                     shot_current,
+                                     obs_current,
+                                     sample_current,
+                                     None,
+                                     ID_Indices))
+    return
+
 def write_row(write_sheet, row_num: int, starting_column: str or int, write_values: list):
     if isinstance(starting_column, str):
         starting_column = ord(starting_column.lower()) - 96
     for wr_i, value in enumerate(write_values):
         write_sheet.cell(row_num, starting_column + wr_i, value)
+    return
 
 
 def sheet_sort_rows(ws, row_start, row_end=0, cols=None, sorter=None, reverse=False):

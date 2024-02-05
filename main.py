@@ -282,46 +282,82 @@ for svy in survey_list:
                                 else:
                                     print('*** (REMOVED) No collected or observed record for {0}. Obs GlobalID: {1}'.format(species, obs_id))
 
-                                # Define tally header, but only once
-                                try:
-                                    tally_header
-                                except:
-                                    tally_header = ['Site_ID', 'Section_Number', 'Species', 'Collected', 'Observed',
-                                                    'Collected_Tally', 'shot_id', 'obs_id', 'Creator']
-
-
 
                     else:
 
                         # Add a 'no fish' obs if no obs in the orig data
                         if survey_list_current[survey_list_header.index('section_condition')] == 'FISHABLE':
-                            print('Notice: NO FISH shot for site {0} : shot No {1} '.format(survey_list_current[survey_list_header.index('GlobalID')], shot_list_current[section_index]))
-                            obs_list_current = [None] * len(obs_list_header)
-                            obs_list_current[obs_list_header.index('section_collected')] = 0
-                            obs_list_current[obs_list_header.index('species_obs')] = 'No Fish'
-                            sample_list_current[sample_list_header.index('species_samp')] = 'No Fish'
-                            # Build object for output
-                            # Find ID Indices:
-                            ID_Indices = [survey_list_header.index('GlobalID'),
-                                          loc_list_header.index('GlobalID'),
-                                          shot_list_header.index('GlobalID'),
-                                          obs_list_header.index('GlobalID'),
-                                          sample_list_header.index('GlobalID'), ]
-                            raw_data.append(cls.resultObject(survey_list_current,
-                                                             loc_list_current,
-                                                             shot_list_current,
-                                                             obs_list_current,
-                                                             sample_list_current,
-                                                             creator,
-                                                             ID_Indices))
 
-                        # Send empty shot to tally for output
-                        tally_results.append([site_id, section_number, 'No Fish', None, None, None, shot_id,
-                                         None, creator])
+                            smpls = list(filter(lambda x: x[sample_list_header.index('ParentGlobalID')] == site_id and x[sample_list_header.index('species_samp')] != 'No Fish', sample_list))
+                            #if samples but the survey only has pone shot then add the species to the one shot
+                            if len(smpls) > 0 and len(sts) == 1:
+
+
+                                smpls = sorted(smpls, key=lambda x: (sample_list_header.index('species_samp'), sample_list_header.index('species_samp_custom')))
+
+                                prev_sp = None
+                                collected = 0
+
+                                for smpl in smpls:
+                                    species = smpl[sample_list_header.index('species_samp')] if smpl[sample_list_header.index('species_samp_custom')] is None else smpl[sample_list_header.index('species_samp_custom')]
+
+                                    if prev_sp != species and prev_sp != None:
+                                        # Create filler for observations:
+                                        func.append_holder_sample_row(shot_list_current, loc_list_current, survey_list_current, prev_sp, raw_data, survey_list_header
+                                            , loc_list_header, shot_list_header, obs_list_header, sample_list_header)
+
+                                        tally_results.append(
+                                            [site_id, section_number, prev_sp, collected, 0, collected, shot_id, None, creator])
+
+                                        collected = 1 if smpl[sample_list_header.index('collected')] in [None, 0] else smpl[sample_list_header.index('collected')]
+
+                                    else:
+                                        collected += 1 if smpl[sample_list_header.index('collected')] in [None, 0] else smpl[sample_list_header.index('collected')]
+
+                                    prev_sp = species
+
+
+                                # Create filler for observations ()
+                                func.append_holder_sample_row(shot_list_current, loc_list_current, survey_list_current, prev_sp, raw_data, survey_list_header
+                                    , loc_list_header, shot_list_header, obs_list_header, sample_list_header)
+
+                                tally_results.append(
+                                    [site_id, section_number, prev_sp, collected, 0, collected, shot_id, None, creator])
+
+
+                            else:
+
+                                print('Notice: NO FISH shot for site {0} : shot No {1} '.format(survey_list_current[survey_list_header.index('GlobalID')], shot_list_current[section_index]))
+                                obs_list_current = [None] * len(obs_list_header)
+                                obs_list_current[obs_list_header.index('section_collected')] = 0
+                                obs_list_current[obs_list_header.index('species_obs')] = 'No Fish'
+                                sample_list_current[sample_list_header.index('species_samp')] = 'No Fish'
+                                # Build object for output
+                                # Find ID Indices:
+                                ID_Indices = [survey_list_header.index('GlobalID'),
+                                              loc_list_header.index('GlobalID'),
+                                              shot_list_header.index('GlobalID'),
+                                              obs_list_header.index('GlobalID'),
+                                              sample_list_header.index('GlobalID'), ]
+                                raw_data.append(cls.resultObject(survey_list_current,
+                                                                 loc_list_current,
+                                                                 shot_list_current,
+                                                                 obs_list_current,
+                                                                 sample_list_current,
+                                                                 creator,
+                                                                 ID_Indices))
+
+                                # Send empty shot to tally for output
+                                tally_results.append([site_id, section_number, 'No Fish', None, None, None, shot_id,
+                                                 None, creator])
 
 
             # If no shots exist, add 1 shot if fishable or samples present and add site information.
             else:
+
+                shot_list_current = [None] * len(shot_list_header)
+                shot_list_current[shot_list_header.index('section_number')] = 1
+
                 # Create filler for observations:
                 obs_list_current = [None] * len(obs_list_header)
                 obs_list_current[obs_list_header.index('section_collected')] = 0
@@ -350,6 +386,23 @@ for svy in survey_list:
                                                      sample_list_current,
                                                      creator,
                                                      ID_Indices))
+
+
+
+            # Define tally header, but only once
+            try:
+                tally_header
+            except:
+                tally_header = ['Site_ID', 'Section_Number', 'Species', 'Collected', 'Observed',
+                                'Collected_Tally', 'shot_id', 'obs_id', 'Creator']
+
+
+## ----------------------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
+## ----- LOOP THROUGH SAMPLES WORKSHEET ---------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
+
 
 sample_checklist = ['section_number_samp',
                     'fork_length',
@@ -499,6 +552,10 @@ for smp in sample_list:
         else:
             print('*** (REMOVED) No info recorded - Sample GlobalID: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]))
 
+## ----------------------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
 
 # Correctly format and order entries as list at top of code.
 for obj in raw_data:
@@ -519,13 +576,21 @@ for i in raw_data:
 raw_data_header.pop(raw_data_header.index('species_samp'))
 raw_data_header[raw_data_header.index('species_obs')] = 'species'
 func.populate_extra_collected(raw_data, raw_data_header)
-func.correct_net_gear_type(raw_data, raw_data_header)
 
+if input_type in ['Fish_Survey_v2']:
+    func.correct_net_gear_type(raw_data, raw_data_header)
+
+#remove records that have no observed or collected data (usually inserted for tally keeping purposes)
 for i in raw_data[:]:
     if i.collation[raw_data_header.index('species')].lower() != 'no fish' and i.collation[raw_data_header.index('section_collected')] <= 0 and i.collation[raw_data_header.index('observed')] == 0 and i.collation[raw_data_header.index('collected')] is None:
         ob_id = i.collation[raw_data_header.index('Obs_GlobalID')]
         raw_data.remove(i)
         print('Notice: REMOVED Obs Record (Negative collected, Zero Observed): {0}'.format(ob_id))
+
+## ----------------------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------------------------------------------
 
 print('Processing data into new format...')
 
@@ -567,7 +632,7 @@ try:
     func.sheet_sort_rows(ws_write, 2, 0, raw_sort_indices)
     func.sheet_sort_rows(ws2_write, 2, 0, tally_sort_indices)
 except:
-    print("ERROR Sorting Columns, Check Sort Names")
+    print("*** ERROR Sorting Columns, Check Sort Names")
 
 # Resize columns to match entry lengths:
 for column_cells in ws_write.columns:
