@@ -120,8 +120,8 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
                 if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
                     shotlist.append(rs_i)
                     prev_section_number = rs_i.shots[shot_header.index('section_number')]
-        print('*** Caution: Any shot in site for {0} used: SiteID {1}\n***          Other valid shots' \
-            ' for site may not be used if marked automatically for No Fish'.format(rs_species, rs_site_id))
+            print('*** Caution: Any shot in site for {0} used: SiteID {1}\n***          Other valid shots' \
+                ' for site may not be used if marked automatically for No Fish'.format(rs_species, rs_site_id))
 
     if rs_sub_shots is None or len(shotlist) == 0:
         print('*** ERROR (shot selector function): No {0} available: SiteID {1}'.format(rs_species, rs_site_id))
