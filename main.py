@@ -24,8 +24,8 @@
 
 ##export_default = False
 
-input_type = 'Fish_Survey_v1'
-##input_type = 'Fish_Survey_v2'
+##input_type = 'Fish_Survey_v1'
+input_type = 'Fish_Survey_v2'
 ##input_type = ''
 
 # The following is to order how each page is presented in the results.
@@ -98,6 +98,7 @@ filename = askopenfilename(initialdir=io_path, title="Open Survey123 XLSX File")
 in_xlfile = os.path.basename(filename)
 io_path = filename.replace(in_xlfile, '')
 
+
 if (len(filename) == 0):
     print('*** PROCESSING CANCELLED')
     pass
@@ -114,6 +115,8 @@ else:
             answer = tkinter.messagebox.askokcancel("Open File Error",
                                                     "Could not open file! Please close Excel. Press OK to retry.")
     root.destroy()
+
+    print('*** OUTPUT FORMAT: {0}'.format(input_type))
 
     print(workbook.sheetnames)
 
