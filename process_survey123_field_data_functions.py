@@ -69,6 +69,7 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
     shotlist = []
 
     if rs_sub_shots is None or len(rs_sub_shots) == 0:
+##        print('\n')
         print('Notice: No collected {0} available in shots for site {1}'.format(rs_species, rs_site_id))
 
     # If matches are found with Site, Species and Collected > 0:
@@ -108,18 +109,19 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
                     shotlist.append(rs_i)
                     prev_section_number = rs_i.shots[shot_header.index('section_number')]
 
-    # If only site match is found (but only one shot):
+    # If only site match is found XX(but only one shot)XX:
     if skip_next == 0:
         rs_sub_shots = list(filter(lambda x: x.shots[shot_header.index('ParentGlobalID')] == rs_site_id, output))
 
-        if len(rs_sub_shots) == 1:
+        if len(rs_sub_shots) > 0:
 ##            skip_next = 1
             prev_section_number = 0
             for rs_i in rs_sub_shots:
                 if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
                     shotlist.append(rs_i)
                     prev_section_number = rs_i.shots[shot_header.index('section_number')]
-
+        print('*** Caution: Any shot in site for {0} used: SiteID {1}\n***          Other valid shots' \
+            ' for site may not be used if marked automatically for No Fish'.format(rs_species, rs_site_id))
 
     if rs_sub_shots is None or len(shotlist) == 0:
         print('*** ERROR (shot selector function): No {0} available: SiteID {1}'.format(rs_species, rs_site_id))
@@ -131,6 +133,7 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
 def adjust_species_count(current, raw_data, PGID, section_num, species, svy_header, obs_header, sample_header,
                          shot_header, tally_results, tally_header):
 
+    #if no collected is set in samples
     collected_new = 1 if current[sample_header.index('collected')] in [0, None] else current[sample_header.index('collected')]
 
     for completed in raw_data:
@@ -140,19 +143,8 @@ def adjust_species_count(current, raw_data, PGID, section_num, species, svy_head
                 sample_header.index('section_number_samp')]:
                 if species == completed.observations[obs_header.index('species_obs')]:
                     # Adjust accordingly
-
-                    #if no collected is set in samples
-##                    if current[sample_header.index('collected')] is None:
-##                        collected_new = 1
-##                    else:
-##                        collected_new = current[sample_header.index('collected')]
-
                     #reduced the obs section collected by sample collected value
-##                    if collected_new > 1:
                     completed.observations[obs_header.index('section_collected')] -= collected_new
-
-##                    else:
-##                        completed.observations[obs_header.index('section_collected')] -= 1
                     break
 
         # Adjust Collected_Tally accordingly:
@@ -169,10 +161,6 @@ def adjust_species_count(current, raw_data, PGID, section_num, species, svy_head
                         return
 
     #if species at site and shot isn't in the data
-##    if current[sample_header.index('collected')] is None:
-##        collected_new = 1
-##    else:
-##        collected_new = current[sample_header.index('collected')]
     tally_results.append(
         [PGID, section_num, species, collected_new, 0, collected_new, section_num, None, None])
 
@@ -195,6 +183,7 @@ def remove_unrequired_no_fish(raw_data, PGID, section_num, svy_header, obs_heade
                             if section_num == item[tally_header.index('Section_Number')]:
                                 if 'No Fish' == item[tally_header.index('Species')]:
                                     tally_results.remove(item)
+                                    print('Notice: REMOVED UNREQUIRED NO FISH for site: {0} - shot: {1}'.format(PGID, section_num))
                                     return
 
     return
@@ -236,6 +225,58 @@ def append_holder_sample_row(shot_current, loc_current, survey_current, species,
                                      sample_current,
                                      None,
                                      ID_Indices))
+    return
+
+def check_sample_in_raw_data(raw_data, sample_ID, sample_header):
+
+    for completed in raw_data:
+        if sample_ID == completed.samples[sample_header.index('GlobalID')]:
+            return True
+
+    return False
+
+def add_samples_to_output_and_tally(samples_list, samples_header, section_number, shot_current, loc_current, survey_current, rawdata, survey_header, loc_header, shot_header, obs_header, tally_results):
+
+    site_id = survey_current[survey_header.index('GlobalID')]
+    shot_id = shot_current[shot_header.index('GlobalID')]
+
+    samples_list = sorted(samples_list, key=lambda x: (samples_header.index('species_samp'), samples_header.index('species_samp_custom')))
+
+    prev_sp = None
+    collected = 0
+
+    ##---------------------------------------------------------------------------------------------------------------
+    ##-- Loop through samples and total up number collected. Then add to raw_data and tally. ------------------------
+    ##---------------------------------------------------------------------------------------------------------------
+
+    for smpl in samples_list:
+        species = smpl[samples_header.index('species_samp')] if smpl[samples_header.index('species_samp_custom')] is None else smpl[samples_header.index('species_samp_custom')]
+
+        if prev_sp != species and prev_sp != None:
+            # Create filler for observations:
+            append_holder_sample_row(shot_current, loc_current, survey_current, prev_sp, rawdata, survey_header
+                , loc_header, shot_header, obs_header, samples_header)
+
+            tally_results.append(
+                [site_id, section_number, prev_sp, collected, 0, collected, shot_id, None, None])
+
+            collected = 1 if smpl[samples_header.index('collected')] in [None, 0] else smpl[samples_header.index('collected')]
+
+        else:
+            collected += 1 if smpl[samples_header.index('collected')] in [None, 0] else smpl[samples_header.index('collected')]
+
+        prev_sp = species
+
+
+    # process the last relevant sample record from loop
+    append_holder_sample_row(shot_current, loc_current, survey_current, prev_sp, rawdata, survey_header
+        , loc_header, shot_header, obs_header, samples_header)
+
+    tally_results.append(
+        [site_id, section_number, prev_sp, collected, 0, collected, shot_id, None, None])
+
+    ##---------------------------------------------------------------------------------------------------------------
+    ##---------------------------------------------------------------------------------------------------------------
     return
 
 def write_row(write_sheet, row_num: int, starting_column: str or int, write_values: list):
