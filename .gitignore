@@ -12,3 +12,4 @@ __pycache__
 .idea
 /venv/
 TO_DO.txt
+*.code-workspace
