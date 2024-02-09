@@ -5,6 +5,7 @@ from openpyxl.styles import NamedStyle
 from openpyxl.utils import get_column_letter
 from openpyxl import load_workbook
 import process_survey123_field_data_classes as cls
+import os
 
 global sssoc_info
 global site_survey_info
@@ -120,11 +121,11 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
                 if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
                     shotlist.append(rs_i)
                     prev_section_number = rs_i.shots[shot_header.index('section_number')]
-            print('*** Caution: Any shot in site for {0} used: SiteID {1}\n***          Other valid shots' \
-                ' for site may not be used if marked automatically for No Fish'.format(rs_species, rs_site_id))
+            print(colour_terminal_output('*** Caution: Any shot in site for {0} used: SiteID {1}\n***          Other valid shots' \
+                ' for site may not be used if marked automatically for No Fish'.format(rs_species, rs_site_id), 'red'))
 
     if rs_sub_shots is None or len(shotlist) == 0:
-        print('*** ERROR (shot selector function): No {0} available: SiteID {1}'.format(rs_species, rs_site_id))
+        print(colour_terminal_output('*** ERROR (shot selector function): No {0} available: SiteID {1}'.format(rs_species, rs_site_id), 'red'))
         return False
     else:
         return random.choice(shotlist)
@@ -202,7 +203,7 @@ def correct_net_gear_type(raw_data, raw_header):
         if rw.collation[raw_header.index('net')].lower() != 'ef':
             rw.collation[raw_header.index('gear_type')] = rw.collation[raw_header.index('net')]
         else:
-            print('*** ERROR Incorrect net type selected for shot id: {0}'.format(rw.collation[raw_header.index('Shot_GlobalID')]))
+            print(colour_terminal_output('*** ERROR Incorrect net type selected for shot id: {0}'.format(rw.collation[raw_header.index('Shot_GlobalID')]), 'red'))
   return
 
 def append_holder_sample_row(shot_current, loc_current, survey_current, species, raw_data, svy_header, loc_header, shot_header, obs_header, sample_header):
@@ -286,6 +287,32 @@ def write_row(write_sheet, row_num: int, starting_column: str or int, write_valu
         write_sheet.cell(row_num, starting_column + wr_i, value)
     return
 
+# Function to determine IDE for terminal colour formatting in colour_terminal_output()
+def ide_eviron():
+    if any('DLIB_SILENCE' in name for name in os.environ):
+        #pyscripter IDE running
+        return 'pyscripter'
+    else:
+        return 'non_pyscripter'
+
+def colour_terminal_output(message: str, colour):
+    if ide_eviron() == 'non_pyscripter':
+        if colour.lower() == 'red':
+            message = '\033[31m' + message + '\033[0m'
+            return message
+        elif colour.lower() == 'green':
+            message = '\033[32m' + message + '\033[0m'
+            return message
+        elif colour.lower() == 'yellow':
+            message = '\033[33m' + message + '\033[0m'
+            return message
+        elif colour.lower() == 'blue':
+            message = '\033[34m' + message + '\033[0m'
+            return message
+        else:
+            return message
+    else:
+        return message
 
 def sheet_sort_rows(ws, row_start, row_end=0, cols=None, sorter=None, reverse=False):
     # #""" Sorts given rows of the sheet

@@ -24,7 +24,6 @@
 
 ##export_default = False
 
-
 ##input_type = 'Fish_Survey_v1'
 input_type = 'Fish_Survey_v2'
 ##input_type = ''
@@ -99,9 +98,8 @@ filename = askopenfilename(initialdir=io_path, title="Open Survey123 XLSX File")
 in_xlfile = os.path.basename(filename)
 io_path = filename.replace(in_xlfile, '')
 
-
 if (len(filename) == 0):
-    print('*** PROCESSING CANCELLED')
+    print(func.colour_terminal_output('*** PROCESSING CANCELLED', 'green'))
     pass
 else:
 
@@ -117,7 +115,7 @@ else:
                                                     "Could not open file! Please close Excel. Press OK to retry.")
     root.destroy()
 
-    print('*** OUTPUT FORMAT: {0}'.format(input_type))
+    print(func.colour_terminal_output('*** OUTPUT FORMAT: {0}'.format(input_type), 'green'))
 
     print(workbook.sheetnames)
 
@@ -178,7 +176,7 @@ else:
             survey_list_current[survey_list_header.index('section_condition')] = 'FISHABLE'
         else:
             survey_list_current[survey_list_header.index('section_condition')] = 'UNFISHABLE'
-            print('*** CAUTION: Survey marked UNFISHABLE for Site ID: {0}'.format(site_id))
+            print(func.colour_terminal_output('*** CAUTION: Survey marked UNFISHABLE for Site ID: {0}'.format(site_id), 'red'))
 
         creator = survey_list_current[survey_list_header.index('Creator')]
 
@@ -505,7 +503,8 @@ else:
                         shotlist = list(filter(lambda x: x.shots[shot_list_header.index('ParentGlobalID')] == site_id and x.shots[shot_list_header.index('section_number')] == section_num,  raw_data))
 
                         if len(shotlist) == 0:
-                            print('*** ERROR: Sample not added. Missing shot listed in sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]))
+                            # print('*** ERROR: Sample not added. Missing shot listed in sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]))
+                            print(func.colour_terminal_output('*** ERROR: Sample not added. Missing shot listed in sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
                         else:
                             obs_list_current = [None] * len(obs_list_header)
                             obs_list_current[obs_list_header.index('section_collected')] = 1
@@ -537,7 +536,8 @@ else:
 
                         #Check sample already in raw_data
                         if func.check_sample_in_raw_data(raw_data,sample_list_current[sample_list_header.index('GlobalID')],sample_list_header) == False:
-                            print('*** ERROR: No Shot for {0} found - Sample GlobalID: {1}\n'.format(species, sample_list_current[sample_list_header.index('GlobalID')]))
+                            # print('*** ERROR: No Shot for {0} found - Sample GlobalID: {1}\n'.format(species, sample_list_current[sample_list_header.index('GlobalID')]))
+                            print(func.colour_terminal_output('*** ERROR: No Shot for {0} found - Sample GlobalID: {1}\n'.format(species, sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
                         else:
                             print('Notice: No Shot Sample of {0} has been added to output for site ID: {1}\n'.format(species, sample_list_current[sample_list_header.index('ParentGlobalID')]))
 
@@ -625,7 +625,7 @@ else:
         func.sheet_sort_rows(ws_write, 2, 0, raw_sort_indices)
         func.sheet_sort_rows(ws2_write, 2, 0, tally_sort_indices)
     except:
-        print("*** ERROR Sorting Columns, Check Sort Names")
+        print(func.colour_terminal_output('*** ERROR Sorting Columns, Check Sort Names', 'red'))
 
     # Resize columns to match entry lengths:
     for column_cells in ws_write.columns:
