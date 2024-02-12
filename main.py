@@ -24,8 +24,10 @@
 
 ##export_default = False
 
-##input_type = 'Fish_Survey_v1'
-input_type = 'Fish_Survey_v2_beta'
+##input_type = 'Fish_Survey_v1' # Original Fish Survey format
+##input_type = 'Fish_Survey_v2' # VEFMAP
+##input_type = 'Fish_Survey_v2_1' # Hack
+input_type = 'Fish_Survey_v2_2' # Lieschke
 ##input_type = ''
 
 # The following is to order how each page is presented in the results.
@@ -45,7 +47,7 @@ if input_type == 'Fish_Survey_v1':
     obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
     sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-elif input_type == 'Fish_Survey_v2': #VEFMAP
+elif input_type == 'Fish_Survey_v2': # VEFMAP
 
     survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
                        -1, -1, 2, 3]
@@ -55,7 +57,7 @@ elif input_type == 'Fish_Survey_v2': #VEFMAP
     obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
     sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-elif input_type == 'Fish_Survey_v2_beta': #Hack
+elif input_type == 'Fish_Survey_v2_1': # Hack
 
     survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
                        -1, -1, 2, 3]
@@ -65,6 +67,15 @@ elif input_type == 'Fish_Survey_v2_beta': #Hack
     obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
     sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
+elif input_type == 'Fish_Survey_v2_2': # Lieschke
+
+    survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                       -1, -1, 2, 3]
+    location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                         3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+    shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, -1, -1, -1, -1, 13]
+    obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+    sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 else:
 
     survey_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,

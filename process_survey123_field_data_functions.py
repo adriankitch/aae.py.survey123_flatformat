@@ -289,11 +289,12 @@ def write_row(write_sheet, row_num: int, starting_column: str or int, write_valu
 
 # Function to determine IDE for terminal colour formatting in colour_terminal_output()
 def ide_eviron():
-    if any('FPS_BROWSER_APP_PROFILE_STRING' in name for name in os.environ) or any('DLIB_SILENCE' in name for name in os.environ):
+    if any('RSTUDIO' in name for name in os.environ) or any('VSCODE_INJECTION' in name for name in os.environ) \
+            or any('PYCHARM_HOSTED' in name for name in os.environ):
         #pyscripter IDE running
-        return 'pyscripter'
-    else:
         return 'non_pyscripter'
+    else:
+        return 'pyscripter'
 
 def colour_terminal_output(message: str, colour):
     if ide_eviron() == 'non_pyscripter':
