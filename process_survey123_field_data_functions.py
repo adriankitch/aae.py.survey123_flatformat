@@ -289,7 +289,7 @@ def write_row(write_sheet, row_num: int, starting_column: str or int, write_valu
 
 # Function to determine IDE for terminal colour formatting in colour_terminal_output()
 def ide_eviron():
-    if any('DLIB_SILENCE' in name for name in os.environ):
+    if any('FPS_BROWSER_APP_PROFILE_STRING' in name for name in os.environ) or any('DLIB_SILENCE' in name for name in os.environ):
         #pyscripter IDE running
         return 'pyscripter'
     else:
