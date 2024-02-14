@@ -26,8 +26,8 @@
 
 ##input_type = 'Fish_Survey_v1' # Original Fish Survey format
 ##input_type = 'Fish_Survey_v2' # VEFMAP
-##input_type = 'Fish_Survey_v2_1' # Hack
-input_type = 'Fish_Survey_v2_2' # Lieschke
+input_type = 'Fish_Survey_v2_1' # Hack
+##input_type = 'Fish_Survey_v2_2' # Lieschke
 ##input_type = ''
 
 # The following is to order how each page is presented in the results.
@@ -88,7 +88,7 @@ else:
 
 
 # Names of columns to sort for raw and tally sheets:
-raw_sorters = ['Site_GlobalID', 'survey_date', 'section_number', 'species', 'observed', 'section_collected']
+raw_sorters = ['survey_date', 'Site_GlobalID', 'section_number', 'species', 'observed', 'section_collected']
 tally_sorters = ['Site_ID', 'Section_Number', 'Species']
 
 # ==========================================================================================================================================#
