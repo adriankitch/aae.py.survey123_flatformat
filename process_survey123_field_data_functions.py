@@ -199,7 +199,7 @@ def populate_extra_collected(raw_data, raw_header):
 
 def correct_net_gear_type(raw_data, raw_header):
   for rw in raw_data:
-    if rw.collation[raw_header.index('gear_type')].lower() == 'net':
+    if rw.collation[raw_header.index('gear_type')].lower() in ['net', 'unknown']:
         if rw.collation[raw_header.index('net')].lower() != 'ef':
             rw.collation[raw_header.index('gear_type')] = rw.collation[raw_header.index('net')]
         else:

@@ -26,7 +26,7 @@
 
 ##input_type = 'Fish_Survey_v1' # Original Fish Survey format
 ##input_type = 'Fish_Survey_v2' # VEFMAP
-input_type = 'Fish_Survey_v2_1' # Hack
+input_type = 'Fish_Survey_v2_1' # Hack, Dawson
 ##input_type = 'Fish_Survey_v2_2' # Lieschke
 ##input_type = ''
 
@@ -57,10 +57,10 @@ elif input_type == 'Fish_Survey_v2': # VEFMAP
     obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
     sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-elif input_type == 'Fish_Survey_v2_1': # Hack
+elif input_type == 'Fish_Survey_v2_1': # Hack, Dawson
 
     survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
-                       -1, -1, 2, 3]
+                       -1, -1, -1, 2, 3]
     location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
                          3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
     shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1, -1, 9, 10, 11, 12, 13]
@@ -88,7 +88,7 @@ else:
 
 
 # Names of columns to sort for raw and tally sheets:
-raw_sorters = ['survey_date', 'Site_GlobalID', 'section_number', 'species', 'observed', 'section_collected']
+raw_sorters = ['survey_date', 'Site_GlobalID', 'section_number', 'species', 'section_collected'] #'observed'
 tally_sorters = ['Site_ID', 'Section_Number', 'Species']
 
 # ==========================================================================================================================================#
@@ -591,7 +591,7 @@ else:
     func.populate_extra_collected(raw_data, raw_data_header)
 
     #Only deal with net attributes for particular survey versions
-    if input_type in ['Fish_Survey_v2']:
+    if input_type.find('Fish_Survey_v2') >= 0:
         func.correct_net_gear_type(raw_data, raw_data_header)
 
     #remove records that have no observed or collected data (usually inserted for tally keeping purposes)
@@ -618,12 +618,17 @@ else:
     # Raw Data:
     row_count = 1
     func.write_row(ws_write, row_count, 1, raw_data_header)
+
+    #remove common name from species and reformat survey_date to remove time
     for result in raw_data:
         row_count += 1
         wer_species = result.collation[raw_data_header.index('species')]
         wer_species = re.sub(r'\(.*?\) *', '', wer_species)
         wer_species = wer_species.strip()
         result.collation[raw_data_header.index('species')] = wer_species
+        sdate =  result.collation[raw_data_header.index('survey_date')]
+        sdate = sdate.strftime('%d/%m/%Y')
+        result.collation[raw_data_header.index('survey_date')] = sdate
         func.write_row(ws_write, row_count, 1, tuple(result.collation))
 
     # Tally Data:
