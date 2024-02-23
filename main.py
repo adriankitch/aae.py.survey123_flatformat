@@ -121,6 +121,7 @@ io_path = localvars.io_path
 filename = askopenfilename(initialdir=io_path, title="Open Survey123 XLSX File")
 in_xlfile = os.path.basename(filename)
 io_path = filename.replace(in_xlfile, '')
+print('Processing file: {0}'.format(in_xlfile))
 
 if (len(filename) == 0):
     print(func.colour_terminal_output('*** PROCESSING CANCELLED', 'green'))
@@ -595,6 +596,7 @@ else:
 
     #Only deal with net attributes for particular survey versions
     if input_type.find('Fish_Survey_v2') >= 0:
+        print('## NOTICE: Gear type correction made ######')
         func.correct_net_gear_type(raw_data, raw_data_header)
 
     #remove records that have no observed or collected data (usually inserted for tally keeping purposes)
