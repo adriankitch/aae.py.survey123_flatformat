@@ -30,6 +30,9 @@ input_type = 'Fish_Survey_v2_1' # Hack, Dawson
 ##input_type = 'Fish_Survey_v2_2' # Lieschke
 ##input_type = ''
 
+#remove the bracketed common name from the output
+remove_common_name = True
+
 # The following is to order how each page is presented in the results.
 
 # The data column will not be output if the index is == -1.
@@ -622,10 +625,11 @@ else:
     #remove common name from species and reformat survey_date to remove time
     for result in raw_data:
         row_count += 1
-        wer_species = result.collation[raw_data_header.index('species')]
-        wer_species = re.sub(r'\(.*?\) *', '', wer_species)
-        wer_species = wer_species.strip()
-        result.collation[raw_data_header.index('species')] = wer_species
+        if remove_common_name == True:
+            wer_species = result.collation[raw_data_header.index('species')]
+            wer_species = re.sub(r'\(.*?\) *', '', wer_species)
+            wer_species = wer_species.strip()
+            result.collation[raw_data_header.index('species')] = wer_species
         sdate =  result.collation[raw_data_header.index('survey_date')]
         sdate = sdate.strftime('%d/%m/%Y')
         result.collation[raw_data_header.index('survey_date')] = sdate
