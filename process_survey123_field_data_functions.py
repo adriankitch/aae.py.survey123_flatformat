@@ -201,13 +201,13 @@ def correct_net_gear_type(raw_data, raw_header):
   for rw in raw_data:
     if rw.collation[raw_header.index('gear_type')].lower() in ['net', 'unknown']:
         if rw.collation[raw_header.index('net')].lower() != 'ef':
-            print('Notice: Gear type converted to Net type')
+            print('## Notice: Gear type converted to Net type ###')
             rw.collation[raw_header.index('gear_type')] = rw.collation[raw_header.index('net')]
         else:
             print(colour_terminal_output('*** ERROR Incorrect net type selected for shot id: {0}'.format(rw.collation[raw_header.index('Shot_GlobalID')]), 'red'))
     else:
         if rw.collation[raw_header.index('net')].lower() != 'ef':
-            print('Notice: Gear type converted to Net type')
+            print('## Notice: Gear type converted to Net type ###')
             rw.collation[raw_header.index('gear_type')] = rw.collation[raw_header.index('net')]
   return
 

@@ -24,71 +24,15 @@
 
 ##export_default = False
 
-##input_type = 'Fish_Survey_v1' # Original Fish Survey format
-##input_type = 'Fish_Survey_v2' # VEFMAP
-input_type = 'Fish_Survey_v2_1' # Hack, Dawson
-##input_type = 'Fish_Survey_v2_2' # Lieschke
-##input_type = ''
+####input_type = 'Fish_Survey_v1' # Original Fish Survey format
+####input_type = 'Fish_Survey_v2' # VEFMAP
+####input_type = 'Fish_Survey_v2_1' # Hack, Dawson
+####input_type = 'Fish_Survey_v2_2' # Lieschke
+##input_type = 'Fish_Survey_v2_3' # Harris
+####input_type = ''
 
 #remove the bracketed common name from the output
 remove_common_name = True
-
-# The following is to order how each page is presented in the results.
-
-# The data column will not be output if the index is == -1.
-# The data column will move to the corresponding index value, e.g. if 'site_code' is at index 1,
-# then [-1, 0, -1, -1, ...] will only output 'site_code' and place it at the start.
-# A 'j' will join that column and the following column, and place it in the position of the value after the 'j'.
-# A list of [0, 1, 2, 3, ...] will not change any order.
-# This will also not take into account 'ObjectID', i.e. 'GlobalID' is the first element.
-if input_type == 'Fish_Survey_v1':
-    survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1, -1,
-                       -1, -1, 2, 3]
-    location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
-                         3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
-    shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1]
-    obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
-    sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
-
-elif input_type == 'Fish_Survey_v2': # VEFMAP
-
-    survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
-                       -1, -1, 2, 3]
-    location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
-                         3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
-    shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, -1, -1]
-    obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
-    sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
-
-elif input_type == 'Fish_Survey_v2_1': # Hack, Dawson
-
-    survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
-                       -1, -1, -1, 2, 3]
-    location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
-                         3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
-    shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1, -1, 9, 10, 11, 12, 13]
-    obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
-    sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
-
-elif input_type == 'Fish_Survey_v2_2': # Lieschke
-
-    survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
-                       -1, -1, 2, 3]
-    location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
-                         3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
-    shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, -1, -1, -1, -1, 13]
-    obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
-    sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
-else:
-
-    survey_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-                       27, 28, 29]
-    location_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                         10]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
-    shot_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-    obs_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    sample_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-
 
 # Names of columns to sort for raw and tally sheets:
 raw_sorters = ['survey_date', 'Site_GlobalID', 'section_number', 'species', 'section_collected'] #'observed'
@@ -140,14 +84,13 @@ else:
                                                     "Could not open file! Please close Excel. Press OK to retry.")
     root.destroy()
 
-    print(func.colour_terminal_output('*** OUTPUT FORMAT: {0}'.format(input_type), 'green'))
-
     print(workbook.sheetnames)
 
     # # ## READ SITE SURVEY DATA =======================================================================================
 
     survey_list = func.read_in_excel_tab(workbook.worksheets[0])
     survey_list_header = list(func.read_in_excel_tab_header(workbook.worksheets[0]))
+    sheetNames = workbook.sheetnames
 
     # # ## READ location DATA =======================================================================================
 
@@ -183,6 +126,93 @@ else:
     print('Gathering Data...')
     raw_data = []
     tally_results = []
+
+    # SELECT OUTPUT FORMATTING DEPENDING ON 1st SHEET NAME
+
+    if sheetNames[0].find('VEFMAP') >= 0:
+        input_type = 'Fish_Survey_v2'
+
+    elif sheetNames[0].find('Hack') >= 0 or sheetNames[0].find('Dawson') >= 0:
+        input_type = 'Fish_Survey_v2_1'
+
+    elif sheetNames[0].find('Lieschke') >= 0:
+        input_type = 'Fish_Survey_v2_2'
+
+    elif sheetNames[0].find('Harris') >= 0:
+        input_type = 'Fish_Survey_v2_3'
+
+    else:
+        input_type = ''
+
+    ####input_type = 'Fish_Survey_v1' # Original Fish Survey format
+    input_type_msg = 'default' if input_type == '' else input_type
+    print(func.colour_terminal_output('*** OUTPUT FORMAT: {0}'.format(input_type_msg), 'green'))
+
+    # The following is to order how each page is presented in the results.
+
+    # The data column will not be output if the index is == -1.
+    # The data column will move to the corresponding index value, e.g. if 'site_code' is at index 1,
+    # then [-1, 0, -1, -1, ...] will only output 'site_code' and place it at the start.
+    # A 'j' will join that column and the following column, and place it in the position of the value after the 'j'.
+    # A list of [0, 1, 2, 3, ...] will not change any order.
+    # This will also not take into account 'ObjectID', i.e. 'GlobalID' is the first element.
+    if input_type == 'Fish_Survey_v1':
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1, -1,
+                           -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2': # VEFMAP
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, -1, -1]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2_1': # Hack, Dawson
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1, -1, 9, 10, 11, 12, 13]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2_2': # Lieschke
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, -1, -1, -1, -1, 13]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2_3': # Harris
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1,0,1,2,3,4,5,6,7,8,-1,-1,-1,-1,-1,9,10,11,12,13]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+    else:
+
+        survey_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+                           27, 28, 29]
+        location_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                             10]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+        obs_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        sample_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
     ## ----------------------------------------------------------------------------------------------------------------------
     ## ----------------------------------------------------------------------------------------------------------------------
@@ -596,12 +626,12 @@ else:
 
     #Only deal with net attributes for particular survey versions
     if input_type.find('Fish_Survey_v2') >= 0:
-        print('## NOTICE: Gear type correction made ######')
+        print('Gear type correction check... ')
         func.correct_net_gear_type(raw_data, raw_data_header)
 
     #remove records that have no observed or collected data (usually inserted for tally keeping purposes)
     for i in raw_data[:]:
-        if i.collation[raw_data_header.index('species')].lower() != 'no fish' and i.collation[raw_data_header.index('section_collected')] <= 0 and i.collation[raw_data_header.index('observed')] == 0 and i.collation[raw_data_header.index('collected')] is None:
+        if (i.collation[raw_data_header.index('species')] is None or i.collation[raw_data_header.index('species')].lower() != 'no fish') and i.collation[raw_data_header.index('section_collected')] <= 0 and i.collation[raw_data_header.index('observed')] == 0 and i.collation[raw_data_header.index('collected')] is None:
             ob_id = i.collation[raw_data_header.index('Obs_GlobalID')]
             raw_data.remove(i)
             print('Notice: REMOVED Obs Record (Negative collected, Zero Observed): {0}'.format(ob_id))
