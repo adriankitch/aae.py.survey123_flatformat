@@ -240,7 +240,7 @@ else:
         # Change gear_type name and set section_condition to (UN)FISHABLE
         survey_list_current[survey_list_header.index('gear_type')] = func.gear_types[
             survey_list_current[survey_list_header.index('gear_type')]]
-        if survey_list_current[survey_list_header.index('section_condition')].lower() == 'yes':
+        if survey_list_current[survey_list_header.index('section_condition')] is None or survey_list_current[survey_list_header.index('section_condition')].lower() == 'yes':
             survey_list_current[survey_list_header.index('section_condition')] = 'FISHABLE'
         else:
             survey_list_current[survey_list_header.index('section_condition')] = 'UNFISHABLE'
