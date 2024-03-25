@@ -144,7 +144,7 @@ else:
     else:
         input_type = ''
 
-    ####input_type = 'Fish_Survey_v1' # Original Fish Survey format
+##    input_type = 'Fish_Survey_v1' # Original Fish Survey format
     input_type_msg = 'default' if input_type == '' else input_type
     print(func.colour_terminal_output('*** OUTPUT FORMAT: {0}'.format(input_type_msg), 'green'))
 
