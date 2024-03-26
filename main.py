@@ -200,7 +200,7 @@ else:
     elif input_type == 'Fish_Survey_v2_3': # Harris
 
         survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
-                           -1, -1, 2, 3]
+                           -1, -1, -1, 2, 3]
         location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
                              3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
         shot_template = [-1,0,1,2,3,4,5,6,7,8,-1,-1,-1,-1,-1,9,10,11,12,13]
@@ -232,6 +232,7 @@ else:
     ## ----- LOOP THROUGH Surveys (site), Loc, Shots and Obs WORKSHEETS to build raw_data base and tally list ---------------
     ## ----------------------------------------------------------------------------------------------------------------------
     ## ----------------------------------------------------------------------------------------------------------------------
+    cur_site = 0
 
     for svy in survey_list:
         survey_list_current = list(svy)
@@ -254,19 +255,34 @@ else:
             loc_list_current = list(lcs)
 
             # Only add data if starting coordinate to not double up on data.
-            if loc_list_current[loc_list_header.index('point_location')] == 'site_start':
+            if cur_site != site_id:
+##            if loc_list_current[loc_list_header.index('point_location')] in ['site_start', 'site_finish']:
+                cur_site = site_id
 
                 # See if there is another location entry with same GlobalID for end coordinates.
                 pair = False
                 x_finish = 0
                 y_finish = 0
-                for same_location in filter(lambda x: x[loc_list_header.index('GlobalID')] == loc_list_current[
-                    loc_list_header.index('GlobalID')], loc_list):
-                    if same_location[loc_list_header.index('point_location')] == 'site_end':
+                x_start = 0
+                y_start = 0
+
+                # For some reason start and finish coords are in order of sheet and not by name?!
+                for same_location in filter(lambda x: x[loc_list_header.index('ParentGlobalID')] == loc_list_current[
+                    loc_list_header.index('ParentGlobalID')], loc_list):
+
+                    if same_location[loc_list_header.index('point_location')] == 'site_start':
+                        pair = True
+                        x_start = same_location[loc_list_header.index('x_coordinate')]
+                        y_start = same_location[loc_list_header.index('y_coordinate')]
+
+                    elif same_location[loc_list_header.index('point_location')] == 'site_finish':
                         pair = True
                         x_finish = same_location[loc_list_header.index('x_coordinate')]
                         y_finish = same_location[loc_list_header.index('y_coordinate')]
 
+
+                loc_list_current.append(x_start)
+                loc_list_current.append(y_start)
                 loc_list_current.append(x_finish)
                 loc_list_current.append(y_finish)
 
@@ -297,6 +313,7 @@ else:
 
                         #If Observations are recorded
                         if len(obs) > 0:
+
                             for obs_list_current in obs:
                                 obs_list_current = list(obs_list_current)
                                 obs_id = obs_list_current[obs_list_header.index('GlobalID')]
@@ -404,7 +421,6 @@ else:
 
                 # If no shots exist, add 1 shot if fishable or samples present, and add site information.
                 else:
-
 ##                    if survey_list_current[survey_list_header.index('section_condition')] == 'FISHABLE':
 
                     shot_list_current = [None] * len(shot_list_header)
@@ -455,6 +471,9 @@ else:
                 except:
                     tally_header = ['Site_ID', 'Section_Number', 'Species', 'Collected', 'Observed',
                                     'Collected_Tally', 'shot_id', 'obs_id', 'Creator']
+
+##            else:
+##                print('*** Site End Location reorded for {0}'.format(site_id))
 
 
     ## ----------------------------------------------------------------------------------------------------------------------
@@ -511,6 +530,7 @@ else:
                         rand_pick = shotlist[0]
                     else:
                         rand_pick = False
+
                 # If a shot is found:
                 if rand_pick != False:
                     # Fix collected number:
