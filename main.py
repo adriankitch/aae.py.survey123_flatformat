@@ -102,6 +102,8 @@ else:
     shot_list = func.read_in_excel_tab(workbook['shot_repeat_2'])
     shot_list_header = list(func.read_in_excel_tab_header(workbook['shot_repeat_2']))
 
+##    shot_list[shot_list_header.index('section_number')] = int( shot_list[shot_list_header.index('section_number')] )
+
     # # ## READ observed DATA =======================================================================================
 
     obs_list = func.read_in_excel_tab(workbook['observed_fish_repeat_3'])
@@ -111,6 +113,8 @@ else:
 
     sample_list = func.read_in_excel_tab(workbook['fish_sample_repeat_4'])
     sample_list_header = list(func.read_in_excel_tab_header(workbook['fish_sample_repeat_4']))
+
+##    sample_list[sample_list_header.index('section_number_samp')] = int( sample_list[sample_list_header.index('section_number_samp')] )
 
     # Sort the samples so any defined shots are at the top.
     sample_list.sort(key=lambda x: 0 if x[sample_list_header.index('section_number_samp')] is None else int(
@@ -129,7 +133,7 @@ else:
 
     # SELECT OUTPUT FORMATTING DEPENDING ON 1st SHEET NAME
 
-    if sheetNames[0].find('VEFMAP') >= 0:
+    if sheetNames[0].find('VEFMAP') >= 0 or sheetNames[0].find('Zeb') >= 0:
         input_type = 'Fish_Survey_v2'
 
     elif sheetNames[0].find('Hack') >= 0 or sheetNames[0].find('Dawson') >= 0:
@@ -167,7 +171,7 @@ else:
         obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
         sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-    elif input_type == 'Fish_Survey_v2': # VEFMAP
+    elif input_type == 'Fish_Survey_v2': # VEFMAP, Zeb
 
         survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
                            -1, -1, 2, 3]
@@ -518,7 +522,7 @@ else:
                 site_id = sample_list_current[sample_list_header.index('ParentGlobalID')]
 
                 # If a shot is already asigned otherwise set to 0 to get a random shot
-                section_number = (0 if sample_list_current[sample_list_header.index('section_number_samp')] is None else sample_list_current[sample_list_header.index('section_number_samp')])
+                section_number = int(0 if sample_list_current[sample_list_header.index('section_number_samp')] is None else sample_list_current[sample_list_header.index('section_number_samp')])
 
                 if section_number == 0:
                     rand_pick = func.get_random_shot(site_id, species, raw_data, obs_list_header, shot_list_header)
@@ -534,7 +538,7 @@ else:
                 # If a shot is found:
                 if rand_pick != False:
                     # Fix collected number:
-                    section_num = (rand_pick.shots[shot_list_header.index('section_number')]
+                    section_num = (int(rand_pick.shots[shot_list_header.index('section_number')])
                         if section_number == 0 else section_number)
                     if sample_list_current[sample_list_header.index('collected')] is None or sample_list_current[
                         sample_list_header.index('collected')] == 0:
@@ -580,9 +584,9 @@ else:
                 else:
 
                     # if a sample has been assigned to a shot which isn't recorded in the observed then add the species
-                    if sample_list_current[sample_list_header.index('section_number_samp')] not in [0, None]:
+                    if int(sample_list_current[sample_list_header.index('section_number_samp')]) not in [0, None]:
 
-                        section_num = sample_list_current[sample_list_header.index('section_number_samp')]
+                        section_num = int(sample_list_current[sample_list_header.index('section_number_samp')])
                         print('Notice: Adding {0} to shot {1} in site ID: {2}'.format(species, section_num, site_id))
 
                         if sample_list_current[sample_list_header.index('collected')] not in [0, None]:
