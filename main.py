@@ -136,7 +136,7 @@ else:
     if sheetNames[0].find('VEFMAP') >= 0 or sheetNames[0].find('Zeb') >= 0:
         input_type = 'Fish_Survey_v2'
 
-    elif sheetNames[0].find('Hack') >= 0 or sheetNames[0].find('Dawson') >= 0:
+    elif sheetNames[0].find('Hack') >= 0 or sheetNames[0].find('Dawson') >= 0 or sheetNames[0].find('Murray_Snags') >= 0:
         input_type = 'Fish_Survey_v2_1'
 
     elif sheetNames[0].find('Lieschke') >= 0:
@@ -177,11 +177,11 @@ else:
                            -1, -1, 2, 3]
         location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
                              3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
-        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, -1, -1]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, -1, -1, -1, -1, -1]
         obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
         sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-    elif input_type == 'Fish_Survey_v2_1': # Hack, Dawson
+    elif input_type == 'Fish_Survey_v2_1': # Hack, Dawson, Murray_Snags
 
         survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
                            -1, -1, -1, 2, 3]
