@@ -596,7 +596,7 @@ else:
 
                         if len(shotlist) == 0:
                             # print('*** ERROR: Sample not added. Missing shot listed in sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]))
-                            print(func.colour_terminal_output('*** ERROR: Sample not added. Missing shot listed in sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
+                            print(func.colour_terminal_output('*** ERROR: Sample not added. Missing shot listed in sample: {0}\nPossible section number format error'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
                         else:
                             obs_list_current = [None] * len(obs_list_header)
                             obs_list_current[obs_list_header.index('section_collected')] = 1
