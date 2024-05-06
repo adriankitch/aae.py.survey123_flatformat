@@ -724,7 +724,7 @@ else:
         func.sheet_sort_rows(ws_write, 2, 0, raw_sort_indices)
         func.sheet_sort_rows(ws2_write, 2, 0, tally_sort_indices)
     except:
-        print(func.colour_terminal_output('*** ERROR Sorting Columns, Check Sort Names', 'red'))
+        print(func.colour_terminal_output('*** ERROR Sorting Columns, Check sort names or Section Number data type', 'red'))
 
     # Resize columns to match entry lengths:
     for column_cells in ws_write.columns:
