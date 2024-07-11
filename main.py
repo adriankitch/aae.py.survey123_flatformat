@@ -584,7 +584,13 @@ else:
                 else:
 
                     # if a sample has been assigned to a shot which isn't recorded in the observed then add the species
-                    if int(sample_list_current[sample_list_header.index('section_number_samp')]) not in [0, None]:
+                    if sample_list_current[sample_list_header.index('section_number_samp')] is None:
+                        section_number_samp = 0
+                    else:
+                        section_number_samp = int(sample_list_current[sample_list_header.index('section_number_samp')])
+
+
+                    if section_number_samp not in [0, None]:
 
                         section_num = int(sample_list_current[sample_list_header.index('section_number_samp')])
                         print('Notice: Adding {0} to shot {1} in site ID: {2}'.format(species, section_num, site_id))
@@ -596,7 +602,7 @@ else:
 
                         if len(shotlist) == 0:
                             # print('*** ERROR: Sample not added. Missing shot listed in sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]))
-                            print(func.colour_terminal_output('*** ERROR: Sample not added. Missing shot listed in sample: {0}\nPossible section number format error'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
+                            print(func.colour_terminal_output('*** ERROR: Sample not added. Missing shot listed in sample: {0}\nPossible section number format error or missing location tab info'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
                         else:
                             obs_list_current = [None] * len(obs_list_header)
                             obs_list_current[obs_list_header.index('section_collected')] = 1
