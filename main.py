@@ -534,7 +534,7 @@ else:
                         rand_pick = shotlist[0]
                     else:
                         rand_pick = False
-                        print(func.colour_terminal_output('*** ERROR: Sample not added to designated shot number. Sample: {0}\nPossible shot recorded as No Fish'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
+                        print(func.colour_terminal_output('*** ERROR: Sample not added to designated shot number. Possible shot recorded as No Fish. Sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
 
                 # If a shot is found:
                 if rand_pick != False:
