@@ -133,10 +133,10 @@ else:
 
     # SELECT OUTPUT FORMATTING DEPENDING ON 1st SHEET NAME
 
-    if sheetNames[0].find('VEFMAP') >= 0 or sheetNames[0].find('Zeb') >= 0 or sheetNames[0].find('DEV_3_19') >= 0:
+    if sheetNames[0].find('VEFMAP') >= 0 or sheetNames[0].find('Zeb') >= 0 or sheetNames[0].find('DEV_3_19') >= 0 or sheetNames[0].find('Dawson') >= 0:
         input_type = 'Fish_Survey_v2'
 
-    elif sheetNames[0].find('Hack') >= 0 or sheetNames[0].find('Dawson') >= 0 or sheetNames[0].find('Murray_Snags') >= 0:
+    elif sheetNames[0].find('Hack') >= 0 or sheetNames[0].find('Murray_Snags') >= 0:
         input_type = 'Fish_Survey_v2_1'
 
     elif sheetNames[0].find('Lieschke') >= 0:
@@ -171,7 +171,7 @@ else:
         obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
         sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-    elif input_type == 'Fish_Survey_v2': # VEFMAP, Zeb
+    elif input_type == 'Fish_Survey_v2': # VEFMAP, Zeb, Dawson
 
         survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
                            -1, -1, 2, 3]
@@ -181,7 +181,7 @@ else:
         obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
         sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-    elif input_type == 'Fish_Survey_v2_1': # Hack, Dawson, Murray_Snags
+    elif input_type == 'Fish_Survey_v2_1': # Hack, Murray_Snags
 
         survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
                            -1, -1, -1, 2, 3]
@@ -535,6 +535,7 @@ else:
                     else:
                         rand_pick = False
 
+
                 # If a shot is found:
                 if rand_pick != False:
                     # Fix collected number:
@@ -621,9 +622,7 @@ else:
                                                              creator,
                                                              ID_Indices))
 
-                            tally_results.append(
-                                [site_id, section_num, species, collected, observed, collected, shotlist[0].shots[shot_list_header.index('GlobalID')],
-                                 None, creator])
+                            tally_results.append([site_id, section_num, species, collected, observed, collected, shotlist[0].shots[shot_list_header.index('GlobalID')], None, creator])
 
                             #A No Fish would have been made if no fish recorded in shot (even though in samples). Need to remove this No Fish
                             func.remove_unrequired_no_fish(raw_data, sample_list_current[sample_list_header.index('ParentGlobalID')], section_num,
