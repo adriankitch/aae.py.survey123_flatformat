@@ -513,7 +513,7 @@ else:
             sample_comparison = 0
 
             for dummy in sample_checklist:
-                if sample_list_current[sample_list_header.index(dummy)] not in [0, None, 'no']:
+                if sample_list_current[sample_list_header.index(dummy)] not in [0, None, 'no'] and species.lower() != 'no fish':
                     skip_samp = FALSE
 
             if skip_samp == FALSE:
@@ -527,14 +527,15 @@ else:
                 if section_number == 0:
                     rand_pick = func.get_random_shot(site_id, species, raw_data, obs_list_header, shot_list_header)
                 else:
-                    shotlist = list(filter(lambda x: x.shots[shot_list_header.index('ParentGlobalID')] == site_id and x.shots[shot_list_header.index('section_number')] == section_number
-                        and x.observations[obs_list_header.index('species_obs')] != 'No Fish',  raw_data))
+##                    shotlist = list(filter(lambda x: x.shots[shot_list_header.index('ParentGlobalID')] == site_id and x.shots[shot_list_header.index('section_number')] == section_number
+##                        and x.observations[obs_list_header.index('species_obs')] != 'No Fish',  raw_data))
+                    shotlist = list(filter(lambda x: x.shots[shot_list_header.index('ParentGlobalID')] == site_id and x.shots[shot_list_header.index('section_number')] == section_number,  raw_data))
 
                     if len(shotlist) > 0:
                         rand_pick = shotlist[0]
                     else:
                         rand_pick = False
-                        print(func.colour_terminal_output('*** ERROR: Sample not added to designated shot number. Possible shot recorded as No Fish. Sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
+##                        print(func.colour_terminal_output('*** ERROR: Sample not added to designated shot number. Possible shot recorded as No Fish. Sample: {0}'.format(sample_list_current[sample_list_header.index('GlobalID')]), 'red'))
 
                 # If a shot is found:
                 if rand_pick != False:
