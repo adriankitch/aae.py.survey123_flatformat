@@ -60,6 +60,130 @@ gear_types = {
 }
 
 
+def define_templates(sheetNames):
+
+
+    if sheetNames[0].find('VEFMAP') >= 0 or sheetNames[0].find('Zeb') >= 0 or sheetNames[0].find('DEV_3_19') >= 0 or sheetNames[0].find('Dawson') >= 0:
+        input_type = 'Fish_Survey_v2'
+
+    elif sheetNames[0].find('Hack') >= 0 or sheetNames[0].find('Murray_Snags') >= 0:
+        input_type = 'Fish_Survey_v2_1'
+
+    elif sheetNames[0].find('Lieschke') >= 0:
+        input_type = 'Fish_Survey_v2_2'
+
+    elif sheetNames[0].find('Harris') >= 0:
+        input_type = 'Fish_Survey_v2_3'
+
+    elif sheetNames[0].find('Crowther') >= 0:
+        input_type = 'Fish_Survey_v2_4'
+
+    elif sheetNames[0].find('v1') >= 0:
+        ##    input_type = 'Fish_Survey_v1' # Original Fish Survey format
+        input_type = 'Fish_Survey_v1'
+
+    elif sheetNames[0].find('ELH_IVT') >= 0:
+        ##    input_type = 'Fish_Survey_v1' # Original Fish Survey format
+        input_type = 'Fish_Survey_v2_5'
+    else:
+        input_type = ''
+
+
+    input_type_msg = 'default' if input_type == '' else input_type
+    print(colour_terminal_output('*** OUTPUT FORMAT: {0}'.format(input_type_msg), 'green'))
+
+    # The following is to order how each page is presented in the results.
+
+    # The data column will not be output if the index is == -1.
+    # The data column will move to the corresponding index value, e.g. if 'site_code' is at index 1,
+    # then [-1, 0, -1, -1, ...] will only output 'site_code' and place it at the start.
+    # A 'j' will join that column and the following column, and place it in the position of the value after the 'j'.
+    # A list of [0, 1, 2, 3, ...] will not change any order.
+    # This will also not take into account 'ObjectID', i.e. 'GlobalID' is the first element.
+    if input_type == 'Fish_Survey_v1':
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1, -1,
+                           -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2': # VEFMAP, Zeb, Dawson
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, -1, -1, -1, -1, -1]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2_1': # Hack, Murray_Snags
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1, -1, 9, 10, 11, 12, 13]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2_2': # Lieschke
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, -1, -1, -1, -1, 13]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2_3': # Harris
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1,0,1,2,3,4,5,6,7,8,-1,-1,-1,-1,-1,9,10,11,12,13]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2_4': # Crowther
+
+        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+                           -1, -1, 2, 3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,-1,-1,-1,-1,-1,14]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+
+    elif input_type == 'Fish_Survey_v2_5': # ELH IVT
+
+        survey_template = [-1,1,4,14,5, 'j',6,7,8,9,10,11,12,0,13,-1,15,16,17,18,19,20,21,22,-1,-1,-1,-1,2,3]
+        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [-1,0,-1,3,15,16,17,18,19,20,21,22,23,24,25,7,12,5,6,8,9,10,11,13,14,-1,-1,-1,-1,-1,4,1,2]
+        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+    else:
+
+        survey_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+                           27, 28, 29]
+        location_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                             10]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+        shot_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+        obs_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        sample_template = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+
+
+
+    return survey_template, location_template, shot_template, obs_template, sample_template, input_type
+
+
+
+
 def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
     skip_next = 0
 
