@@ -13,6 +13,13 @@
 #   Error Check output file not open
 #   Navigate to input file
 #       https://stackoverflow.com/questions/9319317/quick-and-easy-file-dialog-in-python
+#
+#
+# ~~ PACKAGES TO INSTALL ON FIRST RUN ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# openpyxl
+#
+#
+#
 # -------------------------------------------------------------------------------
 #
 
