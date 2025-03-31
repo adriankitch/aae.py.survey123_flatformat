@@ -122,7 +122,7 @@ def define_templates(sheetNames):
     elif input_type == 'Fish_Survey_v2_1': # Hack, Murray_Snags
 
         survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
-                           -1, -1, -1, 2, 3]
+                           -1, -1, 2, 3]
         location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
                              3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
 ##        shot_template = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1, -1, 9, 10, 11, 12, 13]
