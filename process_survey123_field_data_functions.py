@@ -73,7 +73,7 @@ def define_templates(sheetNames):
         input_type = 'Fish_Survey_v2_2'
 
     elif sheetNames[0].find('Harris') >= 0:
-        input_type = 'Fish_Survey_v2_3'
+        input_type = 'Fish_Survey_v2'
 
     elif sheetNames[0].find('Crowther') >= 0:
         input_type = 'Fish_Survey_v2_4'
@@ -109,7 +109,7 @@ def define_templates(sheetNames):
         obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
         sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-    elif input_type == 'Fish_Survey_v2': # VEFMAP, Zeb, Dawson
+    elif input_type == 'Fish_Survey_v2': # VEFMAP, Zeb, Dawson, Harris
 
         survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
                            -1, -1, 2, 3]
@@ -140,15 +140,15 @@ def define_templates(sheetNames):
         obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
         sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
-    elif input_type == 'Fish_Survey_v2_3': # Harris
-
-        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
-                           -1, -1, -1, 2, 3]
-        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
-                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
-        shot_template = [-1,0,1,2,3,4,5,6,7,8,-1,-1,-1,-1,-1,9,10,11,12,13]
-        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
-        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
+##    elif input_type == 'Fish_Survey_v2_3': # Harris
+##
+##        survey_template = [-1, 1, 4, 5, 'j', 6, 7, 8, 9, 10, 11, 12, 0, 13, -1, 14, 15, 16, 17, 18, 19, 20, 21, -1, -1,
+##                           -1, -1, -1, 2, 3]
+##        location_template = [-1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
+##                             3]  # Keep in mind [... x, y] will become ... x_start, y_start, x_end, y_end]
+##        shot_template = [-1,0,1,2,3,4,5,6,7,8,-1,-1,-1,-1,-1,9,10,11,12,13]
+##        obs_template = [-1, -1, -1, 0, 1, 2, -1, -1, -1, -1, -1, -1]
+##        sample_template = [-1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, -1, -1, -1, -1, -1]
 
     elif input_type == 'Fish_Survey_v2_4': # Crowther
 
