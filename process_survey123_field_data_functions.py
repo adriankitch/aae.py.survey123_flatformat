@@ -63,7 +63,7 @@ gear_types = {
 def define_templates(sheetNames):
 
 
-    if sheetNames[0].find('VEFMAP') >= 0 or sheetNames[0].find('Zeb') >= 0 or sheetNames[0].find('DEV_3_19') >= 0 or sheetNames[0].find('Dawson') >= 0:
+    if sheetNames[0].find('VEFMAP') >= 0 or sheetNames[0].find('Zeb') >= 0 or sheetNames[0].find('DEV_3_19') >= 0 or sheetNames[0].find('Dawson') >= 0 or sheetNames[0].find('OConnor') >= 0:
         input_type = 'Fish_Survey_v2'
 
     elif sheetNames[0].find('Hack') >= 0 or sheetNames[0].find('Murray_Snags') >= 0:
