@@ -246,7 +246,7 @@ def get_random_shot(rs_site_id, rs_species, output, obs_header, shot_header):
                 if prev_section_number != rs_i.shots[shot_header.index('section_number')]:
                     shotlist.append(rs_i)
                     prev_section_number = rs_i.shots[shot_header.index('section_number')]
-            print(colour_terminal_output('*** Caution: Any shot in site for {0} used: SiteID {1}\n***          Other valid shots' \
+            print(colour_terminal_output('*** Caution: Any shot in site used for {0} : SiteID {1}\n***          Other valid shots' \
                 ' for site may not be used if marked automatically for No Fish'.format(rs_species, rs_site_id), 'red'))
 
     if rs_sub_shots is None or len(shotlist) == 0:
