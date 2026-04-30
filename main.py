@@ -23,6 +23,20 @@
 # -------------------------------------------------------------------------------
 #
 
+# import io
+import os
+from datetime import datetime
+import openpyxl
+from openpyxl import load_workbook
+import process_survey123_field_data_classes as cls
+import process_survey123_field_data_functions as func
+import local_vars as localvars #### local_vars.py is py file holding local paths (is git ignored)
+from tkinter import *
+import tkinter.messagebox
+from tkinter.filedialog import askopenfilename  # as fd
+##import random
+import re
+
 # ==========================================================================================================================================#
 # ==========================================================Preference Changes:=============================================================#
 # ==========================================================================================================================================#
@@ -40,20 +54,6 @@ tally_sorters = ['Site_ID', 'shot_number', 'Species']
 # ========================================================End Preference Changes:===========================================================#
 # ==========================================================================================================================================#
 
-
-# import io
-import os
-from datetime import datetime
-import openpyxl
-from openpyxl import load_workbook
-import process_survey123_field_data_classes as cls
-import process_survey123_field_data_functions as func
-import local_vars as localvars #### local_vars.py is py file holding local paths (is git ignored)
-from tkinter import *
-import tkinter.messagebox
-from tkinter.filedialog import askopenfilename  # as fd
-import random
-import re
 
 root = Tk()
 root.withdraw()
