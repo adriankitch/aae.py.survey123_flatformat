@@ -63,7 +63,7 @@ class resultObject:
                     header_result.pop(-1)
                     result.pop(-1)
                     extra = 1
-                except:
+                except:  # noqa: E722
                     print("ERROR: JOIN ATTEMPT AT LAST INDEX")
 
             # Ignore cells
